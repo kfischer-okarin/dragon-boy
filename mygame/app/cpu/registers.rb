@@ -14,31 +14,39 @@ module CPU
     end
 
     # def a
-    # def a=(value)
     # def b
-    # def b=(value)
     # def c
-    # def c=(value)
     # def d
-    # def d=(value)
     # def e
-    # def e=(value)
     # def f
-    # def f=(value)
     # def h
-    # def h=(value)
     # def l
-    # def l=(value)
     %i[a b c d e f h l].each do |register|
       eval <<-RUBY
         def #{register}
           @values[:#{register}]
         end
+      RUBY
+    end
 
+    # def a=(value)
+    # def b=(value)
+    # def c=(value)
+    # def d=(value)
+    # def e=(value)
+    # def h=(value)
+    # def l=(value)
+    %i[a b c d e h l].each do |register|
+      eval <<-RUBY
         def #{register}=(value)
           @values[:#{register}] = value
         end
       RUBY
+    end
+
+    def f=(value)
+      # Delete the lower 4 bits
+      @values[:f] = value & 0b11110000
     end
 
     # def af
@@ -61,8 +69,8 @@ module CPU
         end
 
         def #{register1}#{register2}=(value)
-          @values[:#{register1}] = (value >> 8) & 0xFF
-          @values[:#{register2}] = value & 0xFF
+          self.#{register1} = (value >> 8) & 0xFF
+          self.#{register2} = value & 0xFF
         end
       RUBY
     end

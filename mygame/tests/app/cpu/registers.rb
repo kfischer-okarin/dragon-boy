@@ -1,10 +1,17 @@
-def test_cpu_registers_single_registers(_args, assert)
-  %i[a b c d e f h l].each do |register|
+def test_cpu_registers_single_registers_except_f(_args, assert)
+  %i[a b c d e h l].each do |register|
     registers = CPU::Registers.new
     registers.send :"#{register}=", 0b11001100
 
     assert.binary_equal! registers.send(register), 0b11001100
   end
+end
+
+def test_cpu_registers_lower_4_bits_of_f_should_always_be_0(_args, assert)
+  registers = CPU::Registers.new
+  registers.f = 0b11001100
+
+  assert.binary_equal! registers.f, 0b11000000
 end
 
 def test_cpu_registers_single_registers_are_zero_by_default(_args, assert)
