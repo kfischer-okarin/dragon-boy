@@ -1,9 +1,17 @@
-def test_cpu_registers_single(_args, assert)
+def test_cpu_registers_single_registers(_args, assert)
   %i[a b c d e f h l].each do |register|
     registers = CPU::Registers.new
     registers.send :"#{register}=", 0b11001100
 
     assert.equal! registers.send(register), 0b11001100
+  end
+end
+
+def test_cpu_registers_single_registers_are_zero_by_default(_args, assert)
+  %i[a b c d e f h l].each do |register|
+    registers = CPU::Registers.new
+
+    assert.equal! registers.send(register), 0
   end
 end
 
