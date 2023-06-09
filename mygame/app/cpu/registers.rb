@@ -74,5 +74,25 @@ module CPU
         end
       RUBY
     end
+
+    [
+      [:zero, 7],
+      [:subtract, 6],
+      [:half_carry, 5],
+      [:carry, 4]
+    ].each do |flag, bit|
+      eval <<-RUBY
+        def #{flag}
+          # Move the bit to the rightmost position and mask it with 1 to remove all other bits
+          @values[:f] >> #{bit} & 1
+        end
+
+        def #{flag}=(value)
+          # Set the bit to 0 and then set it to the value
+          @values[:f] = @values[:f] & (0b11111111 ^ (1 << #{bit})) |
+                        (value << #{bit})
+        end
+      RUBY
+    end
   end
 end
