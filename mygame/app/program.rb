@@ -34,6 +34,11 @@ class Program
         value = @code_bytes[address + argument_offset]
         argument_offset += 1
         value
+      when :n16
+        # Little endian according to https://gbdev.io/gb-opcodes/optables/
+        value = @code_bytes[address + argument_offset] + (@code_bytes[address + argument_offset + 1] << 8)
+        argument_offset += 2
+        value
       else
         argument
       end
