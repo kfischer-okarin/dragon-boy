@@ -1,0 +1,7 @@
+devid=kfischer-okarin
+devtitle=Kevin Fischer
+gameid=dragon-boy
+gametitle=DragonBoy
+version=0.0.1
+icon=metadata/icon.png
+compile_ruby=true
