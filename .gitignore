@@ -17,6 +17,9 @@ open-source-licenses.txt
 tmp
 VERSION.txt
 
+# Emulator files
+mygame/roms
+
 # Others
 .DS_Store
 Gemfile.lock
