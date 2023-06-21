@@ -25,12 +25,23 @@ class Program
   end
 
   def parse_operation(address)
+    argument_offset = 1
     opcode = @code_bytes[address]
-    operation = Program.opcodes[:unprefixed][opcode]
-    if operation[:type] == :LD
-      { type: :LD, arguments: [:C, 0x42] }
-    else
-      operation
-    end
+    operation_definition = Program.opcodes[:unprefixed][opcode]
+    arguments = operation_definition[:arguments].map { |argument|
+      case argument
+      when :n8
+        value = @code_bytes[address + argument_offset]
+        argument_offset += 1
+        value
+      else
+        argument
+      end
+    }
+
+    {
+      type: operation_definition[:type],
+      arguments: arguments
+    }
   end
 end
