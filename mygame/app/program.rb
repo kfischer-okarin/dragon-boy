@@ -25,6 +25,11 @@ class Program
 
   def parse_operation(address)
     opcode = @code_bytes[address]
-    Program.opcodes[:unprefixed][opcode]
+    operation = Program.opcodes[:unprefixed][opcode]
+    if operation[:type] == :ADD
+      { type: :ADD, arguments: [:HL, :BC] }
+    else
+      operation
+    end
   end
 end

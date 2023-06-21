@@ -5,3 +5,11 @@ def test_program_parse_operation_without_arguments(_args, assert)
 
   assert.equal! operation, { type: :NOP }
 end
+
+def test_program_parse_operation_with_immediate_arguments(_args, assert)
+  program = Program.new "\x09"
+
+  operation = program.parse_operation(0)
+
+  assert.equal! operation, { type: :ADD, arguments: [:HL, :BC] }
+end
