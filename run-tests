@@ -1,0 +1,10 @@
+#!/bin/sh
+
+test_file=${1:-tests/main.rb}
+
+echo "Running tests in $test_file..."
+SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy ./dragonruby mygame --test $test_file
+
+# This grep call is a workaround since DragonRuby does not return an error
+# exit code when the tests fail
+grep '\[Game\] 0 test(s) failed.' logs/dragon-boy.log
