@@ -9,8 +9,7 @@ class Program
         opcodes_json[type].each do |opcode, definition|
           opcode_as_number = opcode.to_i(16)
           result[opcode_as_number] = {
-            type: definition['mnemonic'].downcase.to_sym,
-            length: definition['bytes']
+            type: definition['mnemonic'].to_sym
           }
         end
         @opcodes[type.to_sym] = result
@@ -26,7 +25,6 @@ class Program
 
   def parse_operation(address)
     opcode = @code_bytes[address]
-    operation = Program.opcodes[:unprefixed][opcode]
-    operation.merge(arguments: [])
+    Program.opcodes[:unprefixed][opcode]
   end
 end

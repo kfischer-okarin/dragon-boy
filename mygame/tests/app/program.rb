@@ -3,5 +3,5 @@ def test_program_parse_operation_nop(_args, assert)
 
   operation = program.parse_operation(0)
 
-  assert.equal! operation, { type: :nop, arguments: [], length: 1 }
+  assert.equal! operation, { type: :NOP }
 end
