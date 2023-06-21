@@ -9,7 +9,8 @@ class Program
         opcodes_json[type].each do |opcode, definition|
           opcode_as_number = opcode.to_i(16)
           result[opcode_as_number] = {
-            type: definition['mnemonic'].to_sym
+            type: definition['mnemonic'].to_sym,
+            arguments: definition['operands'].map { |operand| operand['name'].to_sym }
           }
         end
         @opcodes[type.to_sym] = result
@@ -25,11 +26,6 @@ class Program
 
   def parse_operation(address)
     opcode = @code_bytes[address]
-    operation = Program.opcodes[:unprefixed][opcode]
-    if operation[:type] == :ADD
-      { type: :ADD, arguments: [:HL, :BC] }
-    else
-      operation
-    end
+    Program.opcodes[:unprefixed][opcode]
   end
 end

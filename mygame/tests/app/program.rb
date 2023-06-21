@@ -3,7 +3,7 @@ def test_program_parse_operation_without_arguments(_args, assert)
 
   operation = program.parse_operation(0)
 
-  assert.equal! operation, { type: :NOP }
+  assert.equal! operation, { type: :NOP, arguments: [] }
 end
 
 def test_program_parse_operation_with_immediate_arguments(_args, assert)
