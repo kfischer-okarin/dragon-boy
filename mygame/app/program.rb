@@ -27,6 +27,13 @@ class Program
         end
         @opcodes[type.to_sym] = result
       end
+
+      # Special cases
+      @opcodes[:unprefixed][0x22][:type] = :LDI
+      @opcodes[:unprefixed][0x2A][:type] = :LDI
+      @opcodes[:unprefixed][0x32][:type] = :LDD
+      @opcodes[:unprefixed][0x3A][:type] = :LDD
+      @opcodes[:unprefixed][0xF8][:type] = :LDHL
     end
 
     @opcodes
