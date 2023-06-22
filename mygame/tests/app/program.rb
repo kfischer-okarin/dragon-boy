@@ -18,6 +18,11 @@
     name: :operation_with_immediate_n16_arguments,
     program_code: "\x21\x42\x33",
     expected: { type: :LD, arguments: [:HL, 0x3342] }
+  },
+  {
+    name: :operation_with_nonimmediate_register_arguments,
+    program_code: "\x02",
+    expected: { type: :LD, arguments: [:BC_as_pointer, :A] }
   }
 ].each do |test_case|
   define_method "test_program_parse_#{test_case[:name]}" do |_args, assert|

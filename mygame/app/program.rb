@@ -10,7 +10,13 @@ class Program
           opcode_as_number = opcode.to_i(16)
           result[opcode_as_number] = {
             type: definition['mnemonic'].to_sym,
-            arguments: definition['operands'].map { |operand| operand['name'].to_sym }
+            arguments: definition['operands'].map { |operand|
+              if operand['immediate']
+                operand['name'].to_sym
+              else
+                :"#{operand['name']}_as_pointer"
+              end
+            }
           }
         end
         @opcodes[type.to_sym] = result
