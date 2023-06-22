@@ -1,4 +1,10 @@
 class Program
+  Pointer = Struct.new(:address) do
+    def self.[](address)
+      new address
+    end
+  end
+
   def self.opcodes
     unless @opcodes
       opcodes_json = $gtk.parse_json_file('app/opcodes.json')
@@ -14,7 +20,7 @@ class Program
               if operand['immediate']
                 operand['name'].to_sym
               else
-                :"#{operand['name']}_as_pointer"
+                Pointer[operand['name'].to_sym]
               end
             }
           }

@@ -22,7 +22,7 @@
   {
     name: :operation_with_nonimmediate_register_arguments,
     program_code: "\x02",
-    expected: { type: :LD, arguments: [:BC_as_pointer, :A] }
+    expected: { type: :LD, arguments: [Program::Pointer[:BC], :A] }
   }
 ].each do |test_case|
   define_method "test_program_parse_#{test_case[:name]}" do |_args, assert|
