@@ -44,9 +44,17 @@ class Program
   end
 
   def parse_operation(address)
-    argument_offset = 1
     opcode = @code_bytes[address]
-    operation_definition = Program.opcodes[:unprefixed][opcode]
+
+    if opcode == 0xCB # CB-prefixed opcode
+      opcode = @code_bytes[address + 1]
+      argument_offset = 2
+      operation_definition = Program.opcodes[:cbprefixed][opcode]
+    else
+      argument_offset = 1
+      operation_definition = Program.opcodes[:unprefixed][opcode]
+    end
+
     arguments = operation_definition[:arguments].map { |argument|
       case argument
       when :n8

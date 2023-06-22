@@ -58,6 +58,11 @@
     name: :LDD_A_HL,
     program_code: "\x3A",
     expected: { type: :LDD, arguments: [:A, Program::Pointer[:HL]] }
+  },
+  {
+    name: :operation_with_prefixed_opcode,
+    program_code: "\xCB\x11",
+    expected: { type: :RL, arguments: [:C] }
   }
 ].each do |test_case|
   define_method "test_program_parse_#{test_case[:name]}" do |_args, assert|
