@@ -52,6 +52,11 @@ class Program
         value = Pointer[value] if argument == Pointer[:a16]
         argument_offset += 2
         value
+      when :e8
+        value = @code_bytes[address + argument_offset]
+        argument_offset += 1
+        value -= 0x100 if value > 0x7F # Two's complement
+        value
       else
         argument
       end

@@ -28,6 +28,11 @@
     name: :operation_with_pointer_argument,
     program_code: "\x08\x42\x33",
     expected: { type: :LD, arguments: [Program::Pointer[0x3342], :SP] }
+  },
+  {
+    name: :operation_with_signed_number_argument,
+    program_code: "\x18\xFE", # Two's complement of 2 = 0b00000010 is 0b11111110 = 0xFE = -2
+    expected: { type: :JR, arguments: [-2] }
   }
 ].each do |test_case|
   define_method "test_program_parse_#{test_case[:name]}" do |_args, assert|
