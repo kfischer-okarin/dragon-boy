@@ -28,7 +28,8 @@ class Program
         @opcodes[type.to_sym] = result
       end
 
-      # Special cases
+      # Set special types for the load instructions that increment/decrement their pointers
+      # so they can be distinguished just by their type
       @opcodes[:unprefixed][0x22][:type] = :LDI
       @opcodes[:unprefixed][0x2A][:type] = :LDI
       @opcodes[:unprefixed][0x32][:type] = :LDD
