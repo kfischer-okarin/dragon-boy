@@ -25,6 +25,11 @@
     expected: { type: :LD, arguments: [Program::Pointer[:BC], :A], length: 1 }
   },
   {
+    name: :with_immediate_address_argument,
+    program_code: "\xCC\x34\x12",
+    expected: { type: :CALL, arguments: [:Z, 0x1234], length: 3 }
+  },
+  {
     name: :with_pointer_argument,
     program_code: "\x08\x42\x33",
     expected: { type: :LD, arguments: [Program::Pointer[0x3342], :SP], length: 3 }
