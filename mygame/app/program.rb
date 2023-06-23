@@ -22,7 +22,8 @@ class Program
               else
                 Pointer[operand['name'].to_sym]
               end
-            }
+            },
+            length: definition['bytes']
           }
         end
         @opcodes[type.to_sym] = result
@@ -80,7 +81,8 @@ class Program
 
     {
       type: operation_definition[:type],
-      arguments: arguments
+      arguments: arguments,
+      length: operation_definition[:length]
     }
   end
 end
