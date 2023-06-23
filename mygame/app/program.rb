@@ -1,7 +1,9 @@
 class Program
-  Pointer = Struct.new(:address) do
-    def self.[](address)
-      new address
+  unless const_defined? :Pointer # prevent changing the class when hot-reloading this file
+    Pointer = Struct.new(:address) do
+      def self.[](address)
+        new address
+      end
     end
   end
 
