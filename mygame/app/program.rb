@@ -61,8 +61,9 @@ class Program
 
     arguments = operation_definition[:arguments].map { |argument|
       case argument
-      when :n8
+      when :n8, Pointer[:a8]
         value = @code_bytes[address + argument_offset]
+        value = Pointer[value] if argument == Pointer[:a8]
         argument_offset += 1
         value
       when :n16, Pointer[:a16], :a16

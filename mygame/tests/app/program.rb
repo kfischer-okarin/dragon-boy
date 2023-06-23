@@ -30,6 +30,11 @@
     expected: { type: :CALL, arguments: [:Z, 0x1234], length: 3 }
   },
   {
+    name: :with_pointer_to_ff00_memory_area_argument,
+    program_code: "\xE0\x20",
+    expected: { type: :LDH, arguments: [Program::Pointer[0x20], :A], length: 2 }
+  },
+  {
     name: :with_pointer_argument,
     program_code: "\x08\x42\x33",
     expected: { type: :LD, arguments: [Program::Pointer[0x3342], :SP], length: 3 }
