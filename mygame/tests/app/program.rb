@@ -80,7 +80,10 @@
 
     operation = program.parse_operation(0)
 
-    assert.equal! operation.slice(:type, :arguments), test_case[:expected]
+    assert.equal! operation.slice(:type, :arguments),
+                  test_case[:expected],
+                  "Expected operation \"#{test_case[:program_code]}\" to be parsed as " \
+                  "#{test_case[:expected]}, but got #{operation.slice(:type, :arguments)}"
   end
 end
 
