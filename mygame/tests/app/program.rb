@@ -88,7 +88,8 @@
 end
 
 def test_program_parse_operation_length(_args, assert)
-  ["\x00", "\x06\x42", "\x21\x42\x33"].each do |program_code|
+  some_operations_with_different_lengths = ["\x00", "\x06\x42", "\x21\x42\x33"]
+  some_operations_with_different_lengths.each do |program_code|
     program = Program.new program_code
 
     operation = program.parse_operation(0)
