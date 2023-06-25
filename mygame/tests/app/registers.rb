@@ -49,3 +49,13 @@ def test_16bit_register_hl(_args, assert)
   assert.equal! register.h, 0x56
   assert.equal! register.l, 0x78
 end
+
+[:sp, :pc].each do |register|
+  define_method "test_16bit_register_#{register}" do |_args, assert|
+    registers = Registers.new
+
+    registers.send "#{register}=", 0x1234
+
+    assert.equal! registers.send(register), 0x1234
+  end
+end

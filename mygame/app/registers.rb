@@ -7,9 +7,11 @@ class Registers
     @e = 0
     @h = 0
     @l = 0
+    @sp = 0
+    @pc = 0
   end
 
-  attr_accessor :a, :b, :c, :d, :e, :h, :l
+  attr_accessor :a, :b, :c, :d, :e, :h, :l, :sp, :pc
 
   def bc
     (@b << 8) | @c
