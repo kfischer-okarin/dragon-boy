@@ -10,4 +10,31 @@ class Registers
   end
 
   attr_accessor :a, :b, :c, :d, :e, :h, :l
+
+  def bc
+    (@b << 8) | @c
+  end
+
+  def bc=(value)
+    @b = value >> 8
+    @c = value & 0xFF
+  end
+
+  def de
+    (@d << 8) | @e
+  end
+
+  def de=(value)
+    @d = value >> 8
+    @e = value & 0xFF
+  end
+
+  def hl
+    (@h << 8) | @l
+  end
+
+  def hl=(value)
+    @h = value >> 8
+    @l = value & 0xFF
+  end
 end
