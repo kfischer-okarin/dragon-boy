@@ -4,7 +4,7 @@ module Screens
       args.state.rom_viewer = args.state.new_entity(:rom_viewer) do |state|
         state.rom = rom
         state.program = Program.new $gtk.read_file("roms/#{rom}")
-        state.address = 0x200
+        state.address = 0x100
       end
     end
 
@@ -17,7 +17,20 @@ module Screens
     private
 
     def render(args)
-      y = 720
+      render_title_bar(args)
+      render_program(args, x: 0, top: 680)
+      render_bytes(args, x: 640, top: 680)
+    end
+
+    def render_title_bar(args)
+      args.outputs.primitives << {
+        x: 640, y: 720, text: @state.rom, size_enum: 3, alignment_enum: 1
+      }.label!
+      args.outputs.primitives << { x: 0, y: 690, x2: 1280, y2: 690 }.line!
+    end
+
+    def render_program(args, x:, top:)
+      y = top
       address = @state.address
       while y.positive?
         operation = @state.program.parse_operation(address)
@@ -39,10 +52,30 @@ module Screens
           end
         }
         args.outputs.primitives << {
-          x: 10, y: y, text: "#{operation[:type]} #{argument_strings.join(', ')}"
-        }
+          x: x + 10, y: y, text: '%04X' % address
+        }.label!
+        args.outputs.primitives << {
+          x: x + 80, y: y, text: "#{operation[:type]} #{argument_strings.join(', ')}"
+        }.label!
         address += operation[:length]
         y -= 20
+      end
+    end
+
+    def render_bytes(args, x:, top:)
+      y = top
+      address = @state.address.idiv(16) * 16
+      while y.positive?
+        16.times do |i|
+          args.outputs.primitives << {
+            x: x + 80 + i * 30 , y: y, text: '%02X' % @state.program[address + i]
+          }.label!
+        end
+        args.outputs.primitives << {
+          x: x + 10, y: y, text: '%04X' % (address & 0xFFF0)
+        }.label!
+        y -= 20
+        address += 16
       end
     end
 
