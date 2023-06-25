@@ -58,6 +58,8 @@ module Screens
           x: x + 80, y: y, text: "#{operation[:type]} #{argument_strings.join(', ')}"
         }.label!
         address += operation[:length]
+        break if address >= @state.program.length
+
         y -= 20
       end
     end
@@ -76,6 +78,7 @@ module Screens
         }.label!
         y -= 20
         address += 16
+        break if address >= @state.program.length
       end
     end
 
