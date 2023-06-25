@@ -1,4 +1,5 @@
 require 'app/program.rb'
+require 'app/registers.rb'
 require 'app/screens/rom_selection.rb'
 require 'app/screens/rom_viewer.rb'
 
