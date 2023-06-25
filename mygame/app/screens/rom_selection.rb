@@ -27,16 +27,18 @@ module Screens
     def process_input(args)
       mouse = args.inputs.mouse
       @state.hovered_rom_rect = nil
-      @state.selected_rom = nil
+      selected_rom = nil
 
       @state.hovered_rom_rect = @state.rom_rects.find { |rom_rect| mouse.inside_rect? rom_rect }
       if mouse.click && @state.hovered_rom_rect
-        @state.selected_rom = @state.hovered_rom_rect[:rom]
+        selected_rom = @state.hovered_rom_rect[:rom]
       end
 
       key_down = args.inputs.keyboard.key_down
       keyboard_selected_rom_rect = @state.rom_rects.find { |rom_rect| key_down.send(rom_rect[:letter]) }
-      @state.selected_rom = keyboard_selected_rom_rect[:rom] if keyboard_selected_rom_rect
+      selected_rom = keyboard_selected_rom_rect[:rom] if keyboard_selected_rom_rect
+
+      $screen = Screens::RomViewer.new(args, selected_rom) if selected_rom
     end
 
     def render(args)

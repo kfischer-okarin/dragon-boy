@@ -1,5 +1,6 @@
 require 'app/program.rb'
 require 'app/screens/rom_selection.rb'
+require 'app/screens/rom_viewer.rb'
 
 def tick(args)
   setup(args) if args.tick_count.zero?
