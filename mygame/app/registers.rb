@@ -5,6 +5,7 @@ class Registers
     @c = 0
     @d = 0
     @e = 0
+    @f = 0
     @h = 0
     @l = 0
     @sp = 0
@@ -12,6 +13,21 @@ class Registers
   end
 
   attr_accessor :a, :b, :c, :d, :e, :h, :l, :sp, :pc
+
+  attr_reader :f
+
+  def f=(value)
+    @f = value & 0b11110000
+  end
+
+  def af
+    (@a << 8) | @f
+  end
+
+  def af=(value)
+    @a = value >> 8
+    self.f = value & 0xFF
+  end
 
   def bc
     (@b << 8) | @c

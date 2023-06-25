@@ -8,6 +8,28 @@
   end
 end
 
+def test_8bit_register_f(_args, assert)
+  registers = Registers.new
+
+  registers.f = 0b10101010
+
+  assert.equal! registers.f, 0b10100000
+end
+
+def test_16bit_register_af(_args, assert)
+  register = Registers.new
+
+  register.a = 0x12
+  register.f = 0x34
+
+  assert.equal! register.af, 0x1230
+
+  register.af = 0x5678
+
+  assert.equal! register.a, 0x56
+  assert.equal! register.f, 0x70
+end
+
 def test_16bit_register_bc(_args, assert)
   register = Registers.new
 
