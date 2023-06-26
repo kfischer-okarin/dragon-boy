@@ -1,5 +1,5 @@
 [:a, :b, :c, :d, :e, :h, :l].each do |register|
-  define_method "test_8bit_register_#{register}" do |_args, assert|
+  define_method "test_registers_8bit_register_#{register}" do |_args, assert|
     registers = Registers.new
 
     registers.send "#{register}=", 0x12
@@ -8,7 +8,7 @@
   end
 end
 
-def test_8bit_register_f(_args, assert)
+def test_registers_8bit_register_f(_args, assert)
   registers = Registers.new
 
   registers.f = 0b10101010
@@ -16,7 +16,7 @@ def test_8bit_register_f(_args, assert)
   assert.equal! registers.f, 0b10100000
 end
 
-def test_16bit_register_af(_args, assert)
+def test_registers_16bit_register_af(_args, assert)
   register = Registers.new
 
   register.a = 0x12
@@ -30,7 +30,7 @@ def test_16bit_register_af(_args, assert)
   assert.equal! register.f, 0x70
 end
 
-def test_16bit_register_bc(_args, assert)
+def test_registers_16bit_register_bc(_args, assert)
   register = Registers.new
 
   register.b = 0x12
@@ -44,7 +44,7 @@ def test_16bit_register_bc(_args, assert)
   assert.equal! register.c, 0x78
 end
 
-def test_16bit_register_de(_args, assert)
+def test_registers_16bit_register_de(_args, assert)
   register = Registers.new
 
   register.d = 0x12
@@ -58,7 +58,7 @@ def test_16bit_register_de(_args, assert)
   assert.equal! register.e, 0x78
 end
 
-def test_16bit_register_hl(_args, assert)
+def test_registers_16bit_register_hl(_args, assert)
   register = Registers.new
 
   register.h = 0x12
@@ -73,7 +73,7 @@ def test_16bit_register_hl(_args, assert)
 end
 
 [:sp, :pc].each do |register|
-  define_method "test_16bit_register_#{register}" do |_args, assert|
+  define_method "test_registers_16bit_register_#{register}" do |_args, assert|
     registers = Registers.new
 
     registers.send "#{register}=", 0x1234
@@ -81,3 +81,4 @@ end
     assert.equal! registers.send(register), 0x1234
   end
 end
+
