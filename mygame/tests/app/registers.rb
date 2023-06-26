@@ -82,3 +82,50 @@ end
   end
 end
 
+def test_registers_flag_z(_args, assert)
+  registers = Registers.new
+
+  registers.f = 0b00000000
+
+  assert.equal! registers.flag_z, 0
+
+  registers.flag_z = 1
+
+  assert.equal! registers.f, 0b10000000
+end
+
+def test_registers_flag_n(_args, assert)
+  registers = Registers.new
+
+  registers.f = 0b00000000
+
+  assert.equal! registers.flag_n, 0
+
+  registers.flag_n = 1
+
+  assert.equal! registers.f, 0b01000000
+end
+
+def test_registers_flag_h(_args, assert)
+  registers = Registers.new
+
+  registers.f = 0b00000000
+
+  assert.equal! registers.flag_h, 0
+
+  registers.flag_h = 1
+
+  assert.equal! registers.f, 0b00100000
+end
+
+def test_registers_flag_c(_args, assert)
+  registers = Registers.new
+
+  registers.f = 0b00000000
+
+  assert.equal! registers.flag_c, 0
+
+  registers.flag_c = 1
+
+  assert.equal! registers.f, 0b00010000
+end

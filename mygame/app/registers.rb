@@ -55,4 +55,36 @@ class Registers
     @h = value >> 8
     @l = value & 0xFF
   end
+
+  def flag_z
+    (@f & 0b10000000) >> 7
+  end
+
+  def flag_z=(value)
+    @f = (@f & 0b01111111) | (value << 7)
+  end
+
+  def flag_n
+    (@f & 0b01000000) >> 6
+  end
+
+  def flag_n=(value)
+    @f = (@f & 0b10111111) | (value << 6)
+  end
+
+  def flag_h
+    (@f & 0b00100000) >> 5
+  end
+
+  def flag_h=(value)
+    @f = (@f & 0b11011111) | (value << 5)
+  end
+
+  def flag_c
+    (@f & 0b00010000) >> 4
+  end
+
+  def flag_c=(value)
+    @f = (@f & 0b11101111) | (value << 4)
+  end
 end
