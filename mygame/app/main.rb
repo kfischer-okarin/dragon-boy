@@ -1,7 +1,10 @@
+require 'app/game_boy.rb'
 require 'app/program.rb'
 require 'app/registers.rb'
+require 'app/screens/debugger.rb'
 require 'app/screens/rom_selection.rb'
 require 'app/screens/rom_viewer.rb'
+require 'app/ui/registers_view.rb'
 
 def tick(args)
   setup(args) if args.tick_count.zero?

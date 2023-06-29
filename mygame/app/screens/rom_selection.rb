@@ -38,7 +38,7 @@ module Screens
       keyboard_selected_rom_rect = @state.rom_rects.find { |rom_rect| key_down.send(rom_rect[:letter]) }
       selected_rom = keyboard_selected_rom_rect[:rom] if keyboard_selected_rom_rect
 
-      $screen = Screens::RomViewer.new(args, selected_rom) if selected_rom
+      $screen = Screens::Debugger.new(args, game_boy: GameBoy.new(selected_rom)) if selected_rom
     end
 
     def render(args)
