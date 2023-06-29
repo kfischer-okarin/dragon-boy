@@ -26,10 +26,12 @@ module UI
       render_bytes(gtk_outputs)
     end
 
+    private
+
     def render_bytes(gtk_outputs)
-      y = top - 10
+      y = top - vertical_padding
       address = @offset
-      while y > @y
+      while y > @y + vertical_padding
         16.times do |i|
           gtk_outputs.primitives << {
             x: @x + 80 + (i * BYTE_SPACING), y: y, text: '%02X' % @bytes[address + i],
@@ -50,15 +52,19 @@ module UI
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
 
         x = @x + 75 + ((highlight[:address] - @offset) % 16) * BYTE_SPACING
-        y = top - 10 - ((highlight[:address] - @offset) / 16) * LINE_SPACING - 20
+        y = top - vertical_padding - ((highlight[:address] - @offset).idiv(16) * LINE_SPACING) - 20
 
         gtk_outputs.primitives << { x: x, y: y, w: 30, h: 20, path: :pixel }.solid!(highlight[:color])
       end
     end
 
     def maximum_visible_address
-      visible_lines = (@h - 10).idiv LINE_SPACING
+      visible_lines = (@h - vertical_padding * 2).idiv LINE_SPACING
       @offset + (visible_lines * 16) - 1
+    end
+
+    def vertical_padding
+      15
     end
   end
 end
