@@ -1,5 +1,7 @@
 module UI
   class RegistersView
+    PC_COLOR = { r: 0, g: 200, b: 250 }.freeze
+
     attr_accessor :registers, :x, :y, :w, :h
 
     attr_rect
@@ -63,6 +65,7 @@ module UI
       ]
       y -= 45
       gtk_outputs.primitives << [
+        { x: x - 30, y: y - 40, w: 60, h: 40, path: :pixel }.sprite!(PC_COLOR),
         { x: x, y: y, text: 'PC', alignment_enum: 1 }.label!,
         { x: x, y: y - 20, text: '%04X' % @registers.pc, alignment_enum: 1 }.label!
       ]

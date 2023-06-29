@@ -1,6 +1,9 @@
 module UI
   class MemoryView
-    attr_accessor :bytes, :x, :y, :w, :h
+    LINE_SPACING = 28
+    BYTE_SPACING = 35
+
+    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights
 
     attr_rect
 
@@ -11,6 +14,7 @@ module UI
       @w = w
       @h = h
       @offset = 0
+      @highlights = []
     end
 
     def render(gtk_outputs)
@@ -18,24 +22,43 @@ module UI
         { x: @x, y: @y, w: @w, h: @h + 1, r: 0, g: 0, b: 0 }.border!
       ]
 
+      render_highlights(gtk_outputs)
+      render_bytes(gtk_outputs)
+    end
+
+    def render_bytes(gtk_outputs)
       y = top - 10
       address = @offset
-      byte_spacing = 35
-      line_spacing = 28
       while y > @y
         16.times do |i|
           gtk_outputs.primitives << {
-            x: @x + 80 + (i * byte_spacing), y: y, text: '%02X' % @bytes[address + i],
+            x: @x + 80 + (i * BYTE_SPACING), y: y, text: '%02X' % @bytes[address + i],
           }.label!
         end
         gtk_outputs.primitives << {
           x: x + 10, y: y, text: '%04X' % (address & 0xFFF0),
           r: 100, g: 100, b: 100
         }.label!
-        y -= line_spacing
+        y -= LINE_SPACING
         address += 16
         break if address >= @bytes.length
       end
+    end
+
+    def render_highlights(gtk_outputs)
+      @highlights.each do |highlight|
+        next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
+
+        x = @x + 75 + ((highlight[:address] - @offset) % 16) * BYTE_SPACING
+        y = top - 10 - ((highlight[:address] - @offset) / 16) * LINE_SPACING - 20
+
+        gtk_outputs.primitives << { x: x, y: y, w: 30, h: 20, path: :pixel }.solid!(highlight[:color])
+      end
+    end
+
+    def maximum_visible_address
+      visible_lines = (@h - 10).idiv LINE_SPACING
+      @offset + (visible_lines * 16) - 1
     end
   end
 end
