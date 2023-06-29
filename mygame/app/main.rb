@@ -4,6 +4,7 @@ require 'app/registers.rb'
 require 'app/screens/debugger.rb'
 require 'app/screens/rom_selection.rb'
 require 'app/screens/rom_viewer.rb'
+require 'app/ui/memory_view.rb'
 require 'app/ui/registers_view.rb'
 
 def tick(args)

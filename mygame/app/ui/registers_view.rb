@@ -15,7 +15,7 @@ module UI
     def render(gtk_outputs)
       center_x = @x + (@w / 2)
       gtk_outputs.primitives << [
-        { x: @x, y: @y, w: @w, h: @h, r: 0, g: 0, b: 0 }.border!,
+        { x: @x, y: @y, w: @w, h: @h + 1, r: 0, g: 0, b: 0 }.border!,
         { x: center_x, y: top - 10, text: 'Registers', size_enum: 2, alignment_enum: 1 }.label!,
       ]
 
