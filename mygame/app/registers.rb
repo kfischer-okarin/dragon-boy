@@ -5,23 +5,31 @@ class Registers
     @c = 0
     @d = 0
     @e = 0
-    @f = 0
+    @flag_z = 0
+    @flag_n = 0
+    @flag_h = 0
+    @flag_c = 0
     @h = 0
     @l = 0
     @sp = 0
     @pc = 0
   end
 
-  attr_accessor :a, :b, :c, :d, :e, :h, :l, :sp, :pc
+  attr_accessor :a, :b, :c, :d, :e, :h, :l, :sp, :pc, :flag_z, :flag_n, :flag_h, :flag_c
 
-  attr_reader :f
+  def f
+    (@flag_z << 7) | (@flag_n << 6) | (@flag_h << 5) | (@flag_c << 4)
+  end
 
   def f=(value)
-    @f = value & 0b11110000
+    @flag_z = (value & 0b10000000) >> 7
+    @flag_n = (value & 0b01000000) >> 6
+    @flag_h = (value & 0b00100000) >> 5
+    @flag_c = (value & 0b00010000) >> 4
   end
 
   def af
-    (@a << 8) | @f
+    (@a << 8) | f
   end
 
   def af=(value)
@@ -54,37 +62,5 @@ class Registers
   def hl=(value)
     @h = value >> 8
     @l = value & 0xFF
-  end
-
-  def flag_z
-    (@f & 0b10000000) >> 7
-  end
-
-  def flag_z=(value)
-    @f = (@f & 0b01111111) | (value << 7)
-  end
-
-  def flag_n
-    (@f & 0b01000000) >> 6
-  end
-
-  def flag_n=(value)
-    @f = (@f & 0b10111111) | (value << 6)
-  end
-
-  def flag_h
-    (@f & 0b00100000) >> 5
-  end
-
-  def flag_h=(value)
-    @f = (@f & 0b11011111) | (value << 5)
-  end
-
-  def flag_c
-    (@f & 0b00010000) >> 4
-  end
-
-  def flag_c=(value)
-    @f = (@f & 0b11101111) | (value << 4)
   end
 end
