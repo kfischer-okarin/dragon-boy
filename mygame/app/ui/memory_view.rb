@@ -20,7 +20,7 @@ module UI
 
     def render(gtk_outputs)
       gtk_outputs.primitives << [
-        { x: @x, y: @y, w: @w, h: @h + 1, r: 0, g: 0, b: 0 }.border!
+        { x: @x, y: @y, w: @w + 1, h: @h + 1, r: 0, g: 0, b: 0 }.border!
       ]
 
       render_highlights(gtk_outputs)
