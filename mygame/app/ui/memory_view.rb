@@ -57,7 +57,7 @@ module UI
       @highlights.each do |highlight|
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
 
-        x = @x + 75 + ((highlight[:address] - @offset) % 16) * BYTE_SPACING
+        x = @x + 75 + (highlight[:address] & 0x000F) * BYTE_SPACING
         y = top - vertical_padding - ((highlight[:address] - @offset).idiv(16) * LINE_SPACING) - 20
 
         gtk_outputs.primitives << { x: x, y: y, w: 30, h: 20, path: :pixel }.solid!(highlight[:color])
