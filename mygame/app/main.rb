@@ -14,7 +14,20 @@ def tick(args)
 end
 
 def setup(args)
+  args.state.settings = load_settings
   $screen = Screens::RomSelection.new(args)
+end
+
+def load_settings
+  saved_settings = $gtk.parse_json_file 'settings.json'
+  return saved_settings if saved_settings
+
+  $gtk.write_file 'settings.json', <<~JSON
+    {
+      "boot_rom": null
+    }
+  JSON
+  $gtk.parse_json_file 'settings.json'
 end
 
 $gtk.reset

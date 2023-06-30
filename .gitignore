@@ -19,6 +19,7 @@ VERSION.txt
 
 # Emulator files
 mygame/roms
+mygame/settings.json
 
 # Others
 .DS_Store
