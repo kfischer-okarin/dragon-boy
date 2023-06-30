@@ -12,3 +12,9 @@ def test_memory_loads_rom_at_0x0000_to_0x00FF_if_no_boot_rom_is_specified(_args,
 
   assert.equal! memory[0x00FE..0x0101], [0xAA, 0xAA, 0xBB, 0xBB]
 end
+
+def test_memory_length_is_always_64KB(_args, assert)
+  memory = Memory.new rom: "\xAA" * 256
+
+  assert.equal! memory.length, 64 * 1024
+end

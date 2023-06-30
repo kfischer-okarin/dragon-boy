@@ -10,4 +10,8 @@ class Memory
   def [](address)
     @content[address]
   end
+
+  def length
+    65_536
+  end
 end
