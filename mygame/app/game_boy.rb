@@ -5,7 +5,10 @@ class GameBoy
     @rom = rom
     @boot_rom = boot_rom
     @registers = Registers.new
-    @memory = Program.new $gtk.read_file("roms/#{rom}")
+    @memory = Memory.new(
+      rom: $gtk.read_file("roms/#{@rom}"),
+      boot_rom: @boot_rom ? $gtk.read_file(@boot_rom) : nil
+    )
 
     setup_memory unless boot_rom
   end
