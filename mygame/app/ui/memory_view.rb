@@ -3,7 +3,8 @@ module UI
     LINE_SPACING = 28
     BYTE_SPACING = 35
 
-    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights
+    attr_accessor :bytes, :x, :y, :w, :h, :highlights
+    attr_reader :offset
 
     attr_rect
 
@@ -24,6 +25,11 @@ module UI
 
       render_highlights(gtk_outputs)
       render_bytes(gtk_outputs)
+    end
+
+    def offset=(value)
+      @offset = value.clamp(0, @bytes.length - 1)
+      @offset &= 0xFFF0 # Align to 16-byte boundary
     end
 
     private
