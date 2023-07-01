@@ -18,12 +18,14 @@ module UI
         { x: @x, y: @y, w: @w + 1, h: @h + 1, r: 0, g: 0, b: 0 }.border!
       ]
 
+      calc_rendered_operations(gtk_outputs)
       render_operations(gtk_outputs)
     end
 
     private
 
-    def render_operations(gtk_outputs)
+    def calc_rendered_operations(gtk_outputs)
+      @rendered_operations = []
       y = top - vertical_padding
       address = @offset
       while y > @y + vertical_padding
@@ -45,18 +47,32 @@ module UI
             argument.to_s
           end
         }
-        gtk_outputs.primitives << {
-          x: x + 10, y: y, text: '%04X' % address,
-          r: 100, g: 100, b: 100
-        }.label!
-        gtk_outputs.primitives << {
-          x: x + 80, y: y, text: "#{operation[:type]} #{argument_strings.join(', ')}"
-        }.label!
+
+        @rendered_operations << {
+          y: y,
+          address: address,
+          text: "#{operation[:type]} #{argument_strings.join(', ')}",
+          operation: operation
+        }
         address += operation[:length]
         break if address >= @bytes.length
 
         y -= 20
       end
+    end
+
+    def render_operations(gtk_outputs)
+      gtk_outputs.primitives << @rendered_operations.map { |rendered_operation|
+        [
+          {
+            x: @x + 10, y: rendered_operation[:y], text: '%04X' % rendered_operation[:address],
+            r: 100, g: 100, b: 100
+          }.label!,
+          {
+            x: @x + 80, y: rendered_operation[:y], text: rendered_operation[:text]
+          }.label!
+        ]
+      }
     end
 
     def format_hex_value(value, byte_count:)
