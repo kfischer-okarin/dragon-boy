@@ -1,6 +1,6 @@
 module UI
   class ProgramView
-    attr_accessor :bytes, :x, :y, :w, :h, :offset
+    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights
 
     attr_rect
 
@@ -11,6 +11,7 @@ module UI
       @w = w
       @h = h
       @offset = 0
+      @highlights = []
     end
 
     def render(gtk_outputs)
@@ -19,6 +20,7 @@ module UI
       ]
 
       calc_rendered_operations(gtk_outputs)
+      render_highlights(gtk_outputs)
       render_operations(gtk_outputs)
     end
 
@@ -59,6 +61,22 @@ module UI
 
         y -= 20
       end
+    end
+
+    def render_highlights(gtk_outputs)
+      maximum_visible_address = @rendered_operations.last[:address] + @rendered_operations.last[:operation][:length]
+      gtk_outputs.primitives << @highlights.map { |highlight|
+        next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
+
+        rendered_operation = @rendered_operations.find { |rendered_operation|
+          rendered_operation[:address] == highlight[:address]
+        }
+        next unless rendered_operation
+
+        gtk_outputs.primitives << {
+          x: @x + 10, y: rendered_operation[:y] - 20, w: @w - 20, h: 20, path: :pixel
+        }.sprite!(highlight[:color])
+      }
     end
 
     def render_operations(gtk_outputs)

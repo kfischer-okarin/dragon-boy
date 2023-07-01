@@ -15,6 +15,8 @@ module Screens
     def tick(args)
       @state = args.state.debugger
 
+      @program_view.highlights = []
+      @program_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
       @memory_view.highlights = []
       @memory_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
 
