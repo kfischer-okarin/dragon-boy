@@ -17,7 +17,6 @@ module Screens
 
       @program_view.update(args)
 
-      @program_view.highlights = []
       @program_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
       @memory_view.highlights = []
       @memory_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }

@@ -1,6 +1,10 @@
 module UI
   class ProgramView
+    HOVER_COLOR = { r: 255, g: 255, b: 0 }.freeze
+
     attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights
+
+    attr_reader :hovered_operation
 
     attr_rect
 
@@ -15,8 +19,10 @@ module UI
       @rendered_operations = []
     end
 
-    def update(_args)
+    def update(args)
+      reset_highlights
       calc_rendered_operations
+      handle_hover(args)
     end
 
     def render(gtk_outputs)
@@ -29,6 +35,10 @@ module UI
     end
 
     private
+
+    def reset_highlights
+      @highlights = []
+    end
 
     def calc_rendered_operations
       @rendered_operations = []
@@ -66,6 +76,18 @@ module UI
 
         y -= 20
       end
+    end
+
+    def handle_hover(args)
+      @hovered_operation = @rendered_operations.find { |rendered_operation|
+        args.inputs.mouse.inside_rect? rendered_operation[:rect]
+      }
+      return unless @hovered_operation
+
+      @highlights << {
+        address: hovered_operation[:address],
+        color: HOVER_COLOR
+      }
     end
 
     def render_highlights(gtk_outputs)
