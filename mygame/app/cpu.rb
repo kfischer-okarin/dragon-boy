@@ -1,6 +1,8 @@
 class CPU
   attr_reader :cycles
 
+  CYCLES_PER_SECOND = 4_194_304
+
   def initialize(registers:, memory:)
     @registers = registers
     @memory = memory
@@ -26,6 +28,15 @@ class CPU
   def execute_LD(operation)
     arguments = operation[:arguments]
     @registers.send "#{arguments[0].downcase}=", arguments[1]
+    operation[:cycles]
+  end
+
+  def execute_XOR(operation)
+    @registers.a ^= @registers.send(operation[:arguments][1].downcase)
+    @registers.flag_z = @registers.a.zero? ? 1 : 0
+    @registers.flag_n = 0
+    @registers.flag_c = 0
+    @registers.flag_h = 0
     operation[:cycles]
   end
 end

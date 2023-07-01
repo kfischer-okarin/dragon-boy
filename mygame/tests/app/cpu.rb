@@ -23,6 +23,27 @@ def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   assert.equal! cpu.cycles, 12
 end
 
+def test_cpu_execute_operation_xor_register_with_register(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+
+  registers.a = 0b00001111
+  registers.b = 0b10101010
+  registers.f = 0b11110000 # all flags 1
+  operation = { type: :XOR, arguments: [:A, :B], length: 1, cycles: 4, opcode: 0xA8 }
+
+  cpu.execute operation
+
+  assert.equal! registers.a, 0b10100101
+  assert.equal! registers.pc, 0x0001
+  assert.equal! registers.flag_z, 0 # because result was not 0
+  assert.equal! registers.flag_n, 0
+  assert.equal! registers.flag_h, 0
+  assert.equal! registers.flag_c, 0
+  assert.equal! cpu.cycles, 4
+end
+
 def test_cpu_execute_next_operation(_args, assert)
   registers = Registers.new
   memory = Memory.new
