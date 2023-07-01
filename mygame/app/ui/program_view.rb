@@ -34,6 +34,10 @@ module UI
       render_operations(gtk_outputs)
     end
 
+    def maximum_visible_address
+      @rendered_operations.last[:address] + @rendered_operations.last[:operation][:length] - 1
+    end
+
     private
 
     def reset_highlights
@@ -91,7 +95,6 @@ module UI
     end
 
     def render_highlights(gtk_outputs)
-      maximum_visible_address = @rendered_operations.last[:address] + @rendered_operations.last[:operation][:length]
       gtk_outputs.primitives << @highlights.map { |highlight|
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
 
