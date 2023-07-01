@@ -12,6 +12,11 @@ module UI
       @h = h
       @offset = 0
       @highlights = []
+      @rendered_operations = []
+    end
+
+    def update(_args)
+      calc_rendered_operations
     end
 
     def render(gtk_outputs)
@@ -19,15 +24,15 @@ module UI
         { x: @x, y: @y, w: @w + 1, h: @h + 1, r: 0, g: 0, b: 0 }.border!
       ]
 
-      calc_rendered_operations(gtk_outputs)
       render_highlights(gtk_outputs)
       render_operations(gtk_outputs)
     end
 
     private
 
-    def calc_rendered_operations(gtk_outputs)
+    def calc_rendered_operations
       @rendered_operations = []
+
       y = top - vertical_padding
       address = @offset
       while y > @y + vertical_padding
@@ -51,7 +56,7 @@ module UI
         }
 
         @rendered_operations << {
-          y: y,
+          rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
           address: address,
           text: "#{operation[:type]} #{argument_strings.join(', ')}",
           operation: operation
@@ -68,26 +73,26 @@ module UI
       gtk_outputs.primitives << @highlights.map { |highlight|
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
 
-        rendered_operation = @rendered_operations.find { |rendered_operation|
-          rendered_operation[:address] == highlight[:address]
+        rendered_operation = @rendered_operations.find { |rendered|
+          rendered[:address] == highlight[:address]
         }
         next unless rendered_operation
 
-        gtk_outputs.primitives << {
-          x: @x + 10, y: rendered_operation[:y] - 20, w: @w - 20, h: 20, path: :pixel
-        }.sprite!(highlight[:color])
+        gtk_outputs.primitives << rendered_operation[:rect].merge(path: :pixel).sprite!(highlight[:color])
       }
     end
 
     def render_operations(gtk_outputs)
       gtk_outputs.primitives << @rendered_operations.map { |rendered_operation|
+        x = rendered_operation[:rect][:x]
+        y = rendered_operation[:rect][:y] + 20
         [
           {
-            x: @x + 10, y: rendered_operation[:y], text: '%04X' % rendered_operation[:address],
+            x: x, y: y, text: '%04X' % rendered_operation[:address],
             r: 100, g: 100, b: 100
           }.label!,
           {
-            x: @x + 80, y: rendered_operation[:y], text: rendered_operation[:text]
+            x: x + 80, y: y, text: rendered_operation[:text]
           }.label!
         ]
       }
