@@ -1,4 +1,5 @@
 require 'app/game_boy.rb'
+require 'app/cpu.rb'
 require 'app/memory.rb'
 require 'app/operation.rb'
 require 'app/registers.rb'
