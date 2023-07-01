@@ -17,6 +17,7 @@ module Operation
           result = []
           opcodes_json[type].each do |opcode, definition|
             opcode_as_number = opcode.to_i(16)
+            cycles = definition['cycles']
             result[opcode_as_number] = {
               type: definition['mnemonic'].to_sym,
               arguments: definition['operands'].map { |operand|
@@ -26,7 +27,8 @@ module Operation
                   Pointer[operand['name'].to_sym]
                 end
               },
-              length: definition['bytes']
+              length: definition['bytes'],
+              cycles: cycles.size == 1 ? cycles[0] : { taken: cycles[0], untaken: cycles[1] }
             }
           end
           @opcodes[type.to_sym] = result
@@ -83,7 +85,8 @@ module Operation
         type: operation_definition[:type],
         arguments: arguments,
         opcode: opcode,
-        length: operation_definition[:length]
+        length: operation_definition[:length],
+        cycles: operation_definition[:cycles]
       }
     end
   end

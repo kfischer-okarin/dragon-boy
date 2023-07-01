@@ -108,3 +108,19 @@ def test_operation_parse_opcode(_args, assert)
 
   assert.equal! operation[:opcode], 0x21
 end
+
+def test_operation_parse_cycles(_args, assert)
+  bytes = "\x21\x42\x33".bytes
+
+  operation = Operation.parse bytes, 0
+
+  assert.equal! operation[:cycles], 12
+end
+
+def test_operation_parse_cycles_for_conditional_jump(_args, assert)
+  bytes = "\xC2\x42\x33".bytes
+
+  operation = Operation.parse bytes, 0
+
+  assert.equal! operation[:cycles], { taken: 16, untaken: 12 }
+end
