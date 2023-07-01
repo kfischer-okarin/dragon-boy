@@ -100,3 +100,11 @@ def test_operation_parse_length(_args, assert)
                   "but got #{operation[:length]}"
   end
 end
+
+def test_operation_parse_opcode(_args, assert)
+  bytes = "\x21\x42\x33".bytes
+
+  operation = Operation.parse bytes, 0
+
+  assert.equal! operation[:opcode], 0x21
+end

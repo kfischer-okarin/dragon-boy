@@ -82,6 +82,7 @@ module Operation
       {
         type: operation_definition[:type],
         arguments: arguments,
+        opcode: opcode,
         length: operation_definition[:length]
       }
     end
