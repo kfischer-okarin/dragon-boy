@@ -15,6 +15,8 @@ module Screens
     def tick(args)
       @state = args.state.debugger
 
+      @state.game_boy.cpu.execute_next_operation if args.inputs.keyboard.key_down.space
+
       @program_view.update(args)
 
       @program_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
