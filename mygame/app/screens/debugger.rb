@@ -19,6 +19,14 @@ module Screens
 
       @program_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
       @memory_view.highlights = []
+      if @program_view.hovered_operation
+        address = @program_view.hovered_operation[:address]
+        @memory_view.highlights << {
+          address: (address..(address + @program_view.hovered_operation[:operation][:length] - 1)),
+          color: UI::ProgramView::HOVER_COLOR,
+          size: 2
+        }
+      end
       @memory_view.highlights << { address: @state.game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
 
       @program_view.render(args.outputs)

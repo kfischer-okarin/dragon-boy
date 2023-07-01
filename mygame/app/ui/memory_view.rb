@@ -55,12 +55,20 @@ module UI
 
     def render_highlights(gtk_outputs)
       @highlights.each do |highlight|
-        next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
+        addresses = highlight[:address].is_a?(Range) ? highlight[:address].to_a : [highlight[:address]]
+        addresses.each do |address|
+          next unless address >= @offset && address <= maximum_visible_address
 
-        x = @x + 75 + (highlight[:address] & 0x000F) * BYTE_SPACING
-        y = top - vertical_padding - ((highlight[:address] - @offset).idiv(16) * LINE_SPACING) - 20
+          extra_size = highlight[:size] ? (highlight[:size] - 1) * 3 : 0
 
-        gtk_outputs.primitives << { x: x, y: y, w: 30, h: 20, path: :pixel }.solid!(highlight[:color])
+          x = @x + 75 + (address & 0x000F) * BYTE_SPACING
+          y = top - vertical_padding - ((address - @offset).idiv(16) * LINE_SPACING) - 20
+
+          gtk_outputs.primitives << {
+            x: x - extra_size, y: y - extra_size,
+            w: 30 + (extra_size * 2), h: 20 + (extra_size * 2), path: :pixel
+          }.solid!(highlight[:color])
+        end
       end
     end
 
