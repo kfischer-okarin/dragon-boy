@@ -22,3 +22,20 @@ def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   assert.equal! registers.pc, 0x0003
   assert.equal! cpu.cycles, 12
 end
+
+def test_cpu_execute_next_operation(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  memory.load_rom "\x00\x00\x02"
+  registers.pc = 0x0002
+
+  executed_operation = nil
+  cpu.define_singleton_method :execute do |operation|
+    executed_operation = operation
+  end
+
+  cpu.execute_next_operation
+
+  assert.equal! executed_operation[:opcode], 0x02
+end
