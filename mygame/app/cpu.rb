@@ -15,6 +15,10 @@ class CPU
 
   private
 
+  def execute_NOP(operation)
+    operation[:cycles]
+  end
+
   def execute_LD(operation)
     arguments = operation[:arguments]
     @registers.send "#{arguments[0].downcase}=", arguments[1]
