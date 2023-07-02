@@ -17,6 +17,23 @@ def test_cpu_execute_advances_pc_by_operation_length(_args, assert)
   end
 end
 
+def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
+  [
+    CPUTests.operation(type: :NOP, arguments: [], cycles: 4),
+    CPUTests.operation(type: :LD, arguments: [:A, 0x12], cycles: 8)
+  ].each do |operation|
+    registers = Registers.new
+    memory = Memory.new
+    cpu = CPU.new registers: registers, memory: memory
+
+    cpu.execute operation
+
+    assert.equal! cpu.cycles,
+                  operation[:cycles],
+                  "Expected cycles to be advanced by #{operation[:cycles]} but was advanced by #{cpu.cycles}"
+  end
+end
+
 def test_cpu_execute_operation_nop(_args, assert)
   registers = Registers.new
   memory = Memory.new
@@ -26,7 +43,6 @@ def test_cpu_execute_operation_nop(_args, assert)
   cpu.execute operation
 
   assert.equal! registers.pc, 0x0001
-  assert.equal! cpu.cycles, 4
 end
 
 def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
@@ -38,7 +54,6 @@ def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   cpu.execute operation
 
   assert.equal! registers.sp, 0x2345
-  assert.equal! cpu.cycles, 12
 end
 
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
@@ -58,7 +73,6 @@ def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   assert.equal! registers.flag_n, 0
   assert.equal! registers.flag_h, 0
   assert.equal! registers.flag_c, 0
-  assert.equal! cpu.cycles, 4
 end
 
 def test_cpu_execute_next_operation(_args, assert)
