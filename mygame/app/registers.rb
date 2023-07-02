@@ -63,4 +63,10 @@ class Registers
     @h = value >> 8
     @l = value & 0xFF
   end
+
+  def to_h
+    {
+      a: @a, b: @b, c: @c, d: @d, e: @e, f: f, h: @h, l: @l, sp: @sp, pc: @pc
+    }
+  end
 end

@@ -129,3 +129,31 @@ def test_registers_flag_c(_args, assert)
 
   assert.equal! registers.f, 0b00010000
 end
+
+def test_registers_to_h(_args, assert)
+  registers = Registers.new
+
+  registers.a = 0x12
+  registers.f = 0b10100000
+  registers.b = 0x56
+  registers.c = 0x78
+  registers.d = 0x9a
+  registers.e = 0xbc
+  registers.h = 0xde
+  registers.l = 0xf0
+  registers.sp = 0x1234
+  registers.pc = 0x5678
+
+  assert.equal! registers.to_h, {
+    a: 0x12,
+    f: 0b10100000,
+    b: 0x56,
+    c: 0x78,
+    d: 0x9a,
+    e: 0xbc,
+    h: 0xde,
+    l: 0xf0,
+    sp: 0x1234,
+    pc: 0x5678
+  }
+end
