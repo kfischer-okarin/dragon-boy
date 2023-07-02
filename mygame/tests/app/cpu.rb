@@ -78,16 +78,35 @@ def test_cpu_execute_operation_xor_register_with_register(_args, assert)
 
   registers.a = 0b00001111
   registers.b = 0b10101010
-  registers.f = 0b11110000 # all flags 1
   operation = CPUTests.operation(type: :XOR, arguments: [:A, :B])
 
   cpu.execute operation
 
   assert.equal! registers.a, 0b10100101
-  assert.equal! registers.flag_z, 0 # because result was not 0
-  assert.equal! registers.flag_n, 0
-  assert.equal! registers.flag_h, 0
-  assert.equal! registers.flag_c, 0
+end
+
+def test_cpu_execute_operation_xor_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    arguments_that_result_not_in_zero = lambda { |registers, _memory|
+      registers.a = 0b10000000
+      registers.b = 0b00000000
+    }
+    operation_will_set_flags(
+      { type: :XOR, arguments: [:A, :B] },
+      to: { z: 0, n: 0, h: 0, c: 0 },
+      given: arguments_that_result_not_in_zero
+    )
+
+    arguments_that_result_in_zero = lambda { |registers, _memory|
+      registers.a = 0b10000000
+      registers.b = 0b10000000
+    }
+    operation_will_set_flags(
+      { type: :XOR, arguments: [:A, :B] },
+      to: { z: 1, n: 0, h: 0, c: 0 },
+      given: arguments_that_result_in_zero
+    )
+  end
 end
 
 def test_cpu_execute_next_operation(_args, assert)
@@ -137,6 +156,24 @@ module CPUTests
                        flags,
                        "Expected flags not to change after #{operation} but " \
                        "they changed from #{flags} to #{registers.flags}"
+      end
+    end
+
+    def operation_will_set_flags(operation, to:, given: nil)
+      all_flag_combinations.each do |flags|
+        registers = Registers.new
+        memory = Memory.new
+        cpu = CPU.new registers: registers, memory: memory
+        given&.call(registers, memory)
+        registers.flags = flags
+
+        cpu.execute CPUTests.operation(operation)
+
+        actual_flags = registers.flags.slice(*to.keys)
+        @assert.equal! actual_flags,
+                       to,
+                       "Expected flags with values #{to} after executing #{operation} but " \
+                       "they changed had values #{actual_flags}"
       end
     end
 
