@@ -48,6 +48,12 @@ def test_cpu_execute_operation_nop(_args, assert)
   assert.equal! memory.to_a, memory_before
 end
 
+def test_cpu_execute_operation_nop_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags type: :NOP, arguments: []
+  end
+end
+
 def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
@@ -57,6 +63,12 @@ def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   cpu.execute operation
 
   assert.equal! registers.sp, 0x2345
+end
+
+def test_cpu_execute_operation_ld_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags type: :LD, arguments: [:SP, 0x2345]
+  end
 end
 
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
@@ -100,6 +112,53 @@ module CPUTests
     def operation(operation)
       # Add some defaults so that execute doesn't fail
       { length: 1, cycles: 4, opcode: 0x00 }.merge operation
+    end
+
+    def test_flags(assert, &block)
+      FlagsTestDSL.new(assert).instance_eval(&block)
+    end
+  end
+
+  class FlagsTestDSL
+    def initialize(assert)
+      @assert = assert
+    end
+
+    def operation_will_not_change_any_flags(operation)
+      all_flag_combinations.each do |flags|
+        registers = Registers.new
+        memory = Memory.new
+        cpu = CPU.new registers: registers, memory: memory
+        registers.flags = flags
+
+        cpu.execute CPUTests.operation(operation)
+
+        @assert.equal! registers.flags,
+                       flags,
+                       "Expected flags not to change after #{operation} but " \
+                       "they changed from #{flags} to #{registers.flags}"
+      end
+    end
+
+    def all_flag_combinations
+      [
+        { z: 0, n: 0, h: 0, c: 0 },
+        { z: 0, n: 0, h: 0, c: 1 },
+        { z: 0, n: 0, h: 1, c: 0 },
+        { z: 0, n: 0, h: 1, c: 1 },
+        { z: 0, n: 1, h: 0, c: 0 },
+        { z: 0, n: 1, h: 0, c: 1 },
+        { z: 0, n: 1, h: 1, c: 0 },
+        { z: 0, n: 1, h: 1, c: 1 },
+        { z: 1, n: 0, h: 0, c: 0 },
+        { z: 1, n: 0, h: 0, c: 1 },
+        { z: 1, n: 0, h: 1, c: 0 },
+        { z: 1, n: 0, h: 1, c: 1 },
+        { z: 1, n: 1, h: 0, c: 0 },
+        { z: 1, n: 1, h: 0, c: 1 },
+        { z: 1, n: 1, h: 1, c: 0 },
+        { z: 1, n: 1, h: 1, c: 1 }
+      ]
     end
   end
 end
