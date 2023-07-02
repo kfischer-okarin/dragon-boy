@@ -7,7 +7,7 @@ class Memory
 
   def load_rom(rom)
     @rom = rom.bytes
-    @content = @rom.dup
+    @content[0x0000...@rom.length] = @rom.dup
   end
 
   def load_boot_rom(boot_rom)
@@ -21,5 +21,9 @@ class Memory
 
   def length
     65_536
+  end
+
+  def to_a
+    @content.dup
   end
 end

@@ -21,3 +21,13 @@ def test_memory_length_is_always_64KB(_args, assert)
 
   assert.equal! memory.length, 64 * 1024
 end
+
+def test_memory_to_a(_args, assert)
+  memory = Memory.new
+  memory.load_rom("\xAA" * 256)
+
+  memory_array = memory.to_a
+
+  assert.equal! memory_array.length, memory.length
+  assert.equal! memory_array[0...256], ("\xAA" * 256).bytes
+end
