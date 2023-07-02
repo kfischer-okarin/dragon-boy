@@ -2,7 +2,7 @@ module UI
   class ProgramView
     HOVER_COLOR = { r: 255, g: 255, b: 0 }.freeze
 
-    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights
+    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints
 
     attr_reader :hovered_operation
 
@@ -17,12 +17,14 @@ module UI
       @offset = 0
       @highlights = []
       @rendered_operations = []
+      @breakpoints = {}
     end
 
     def update(args)
       reset_highlights
       calc_rendered_operations
       handle_hover(args)
+      handle_toggle_breakpoint(args)
     end
 
     def render(gtk_outputs)
@@ -94,6 +96,17 @@ module UI
       }
     end
 
+    def handle_toggle_breakpoint(args)
+      return unless args.inputs.mouse.click && @hovered_operation
+
+      address = @hovered_operation[:address]
+      if @breakpoints.key? address
+        @breakpoints.delete address
+      else
+        @breakpoints[address] = true
+      end
+    end
+
     def render_highlights(gtk_outputs)
       gtk_outputs.primitives << @highlights.map { |highlight|
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
@@ -111,15 +124,22 @@ module UI
       gtk_outputs.primitives << @rendered_operations.map { |rendered_operation|
         x = rendered_operation[:rect][:x]
         y = rendered_operation[:rect][:y] + 20
-        [
+        address = rendered_operation[:address]
+        operation_primitives = [
           {
-            x: x, y: y, text: '%04X' % rendered_operation[:address],
+            x: x, y: y, text: '%04X' % address,
             r: 100, g: 100, b: 100
           }.label!,
           {
             x: x + 80, y: y, text: rendered_operation[:text]
           }.label!
         ]
+        if @breakpoints.key? address
+          operation_primitives << {
+            x: x + 60, y: y, text: 'B', r: 255, g: 0, b: 0
+          }.label!
+        end
+        operation_primitives
       }
     end
 
