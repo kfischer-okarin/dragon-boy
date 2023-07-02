@@ -28,6 +28,19 @@ class Registers
     @flag_c = (value & 0b00010000) >> 4
   end
 
+  def flags
+    {
+      z: @flag_z, n: @flag_n, h: @flag_h, c: @flag_c
+    }
+  end
+
+  def flags=(value)
+    @flag_z = value[:z]
+    @flag_n = value[:n]
+    @flag_h = value[:h]
+    @flag_c = value[:c]
+  end
+
   def af
     (@a << 8) | f
   end
