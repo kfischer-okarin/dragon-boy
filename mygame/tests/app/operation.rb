@@ -82,7 +82,7 @@
 
     assert.equal! operation.slice(:type, :arguments),
                   test_case[:expected],
-                  "Expected operation \"#{test_case[:program_code]}\" to be parsed as " \
+                  "Expected operation \"#{OperationTests.byte_string(bytes)}\" to be parsed as " \
                   "#{test_case[:expected]}, but got #{operation.slice(:type, :arguments)}"
   end
 end
@@ -96,7 +96,7 @@ def test_operation_parse_length(_args, assert)
 
     assert.equal! operation[:length],
                   program_code.length,
-                  "Expected operation \"#{program_code}\" to have length #{program_code.length}, " \
+                  "Expected operation \"#{OperationTests.byte_string(bytes)}\" to have length #{program_code.length}, " \
                   "but got #{operation[:length]}"
   end
 end
@@ -123,4 +123,12 @@ def test_operation_parse_cycles_for_conditional_jump(_args, assert)
   operation = Operation.parse bytes, 0
 
   assert.equal! operation[:cycles], { taken: 16, untaken: 12 }
+end
+
+module OperationTests
+  class << self
+    def byte_string(bytes)
+      bytes.map { |byte| '\x%02X' % byte }.join
+    end
+  end
 end
