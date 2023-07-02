@@ -45,4 +45,13 @@ class CPU
     @registers.flag_h = 0
     operation[:cycles]
   end
+
+  def execute_BIT(operation)
+    bit = operation[:arguments][0]
+    register = operation[:arguments][1].downcase
+    @registers.flag_z = (@registers.send(register) & (1 << bit)).zero? ? 1 : 0
+    @registers.flag_n = 0
+    @registers.flag_h = 1
+    operation[:cycles]
+  end
 end

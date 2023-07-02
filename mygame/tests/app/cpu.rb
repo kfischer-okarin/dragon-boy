@@ -136,6 +136,34 @@ def test_cpu_execute_operation_xor_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_bit_on_register(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_set_flags(
+      { type: :BIT, arguments: [7, :H] },
+      to: { z: 1, n: 0, h: 1 },
+      given: lambda { |registers, _memory|
+        registers.h = 0b01111111
+      }
+    )
+
+    operation_will_set_flags(
+      { type: :BIT, arguments: [6, :L] },
+      to: { z: 0, n: 0, h: 1 },
+      given: lambda { |registers, _memory|
+        registers.l = 0b01000000
+      }
+    )
+
+    operation_will_ignore_flags(
+      { type: :BIT, arguments: [5, :C] },
+      [:c],
+      given: lambda { |registers, _memory|
+        registers.c = 0b00000000
+      }
+    )
+  end
+end
+
 def test_cpu_execute_next_operation(_args, assert)
   registers = Registers.new
   memory = Memory.new
@@ -171,6 +199,10 @@ module CPUTests
     end
 
     def operation_will_not_change_any_flags(operation, given: nil)
+      operation_will_ignore_flags operation, %i[z n h c], given: given
+    end
+
+    def operation_will_ignore_flags(operation, ignored_flags, given: nil)
       all_flag_combinations.each do |flags|
         registers = Registers.new
         memory = Memory.new
@@ -180,10 +212,11 @@ module CPUTests
 
         cpu.execute CPUTests.operation(operation)
 
-        @assert.equal! registers.flags,
-                       flags,
-                       "Expected flags not to change after #{operation} but " \
-                       "they changed from #{flags} to #{registers.flags}"
+        actual_flags = registers.flags.slice(*ignored_flags)
+        @assert.equal! actual_flags,
+                       flags.slice(*ignored_flags),
+                       "Expected flags #{ignored_flags} not to change after executing #{operation} but " \
+                       "they changed from #{flags} to #{actual_flags}"
       end
     end
 
