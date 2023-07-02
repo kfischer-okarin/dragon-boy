@@ -19,6 +19,10 @@ class Memory
     @content[address]
   end
 
+  def []=(address, value)
+    @content[address] = value
+  end
+
   def length
     65_536
   end
