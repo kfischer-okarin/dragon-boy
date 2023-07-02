@@ -38,7 +38,7 @@ def test_cpu_execute_operation_nop(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = { type: :NOP, arguments: [], length: 1, cycles: 4, opcode: 0x00 }
+  operation = CPUTests.operation(type: :NOP, arguments: [])
 
   cpu.execute operation
 
@@ -49,7 +49,7 @@ def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = { type: :LD, arguments: [:SP, 0x2345], length: 3, cycles: 12, opcode: 0x31 }
+  operation = CPUTests.operation(type: :LD, arguments: [:SP, 0x2345])
 
   cpu.execute operation
 
@@ -64,7 +64,7 @@ def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   registers.a = 0b00001111
   registers.b = 0b10101010
   registers.f = 0b11110000 # all flags 1
-  operation = { type: :XOR, arguments: [:A, :B], length: 1, cycles: 4, opcode: 0xA8 }
+  operation = CPUTests.operation(type: :XOR, arguments: [:A, :B])
 
   cpu.execute operation
 
