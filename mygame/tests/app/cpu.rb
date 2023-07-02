@@ -39,10 +39,13 @@ def test_cpu_execute_operation_nop(_args, assert)
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
   operation = CPUTests.operation(type: :NOP, arguments: [])
+  registers_before = registers.to_h
+  memory_before = memory.to_a
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0001
+  assert.equal! registers.to_h.except(:pc), registers_before.except(:pc)
+  assert.equal! memory.to_a, memory_before
 end
 
 def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
