@@ -90,10 +90,46 @@ def test_cpu_execute_operation_ldd_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_not_change_any_flags(
       { type: :LDD, arguments: [Operation::Pointer[:HL], :A] },
-      given: lambda { |registers, memory|
+      given: lambda { |registers, _memory|
         registers.a = 0x12
         registers.hl = 0x9FFF
       }
+    )
+  end
+end
+
+def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 12, untaken: 8 })
+  registers.pc = 0x0120
+  registers.flag_z = 0
+
+  cpu.execute operation
+
+  assert.equal! registers.pc, 0x0120 + 2 - 12
+  assert.equal! cpu.cycles, 12
+end
+
+def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 12, untaken: 8 })
+  registers.pc = 0x0120
+  registers.flag_z = 1
+
+  cpu.execute operation
+
+  assert.equal! registers.pc, 0x0120 + 2
+  assert.equal! cpu.cycles, 8
+end
+
+def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :JR, arguments: [:NZ, -12], cycles: { taken: 12, untaken: 8 } },
     )
   end
 end

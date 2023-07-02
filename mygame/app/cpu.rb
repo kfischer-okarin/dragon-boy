@@ -37,6 +37,15 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_JR(operation)
+    if condition_fulfilled? operation[:arguments][0]
+      @registers.pc += operation[:arguments][1]
+      operation[:cycles][:taken]
+    else
+      operation[:cycles][:untaken]
+    end
+  end
+
   def execute_XOR(operation)
     @registers.a ^= @registers.send(operation[:arguments][1].downcase)
     @registers.flag_z = @registers.a.zero? ? 1 : 0
@@ -53,5 +62,18 @@ class CPU
     @registers.flag_n = 0
     @registers.flag_h = 1
     operation[:cycles]
+  end
+
+  def condition_fulfilled?(condition)
+    case condition
+    when :NZ
+      @registers.flag_z.zero?
+    when :Z
+      @registers.flag_z == 1
+    when :NC
+      @registers.flag_c.zero?
+    when :C
+      @registers.flag_c == 1
+    end
   end
 end
