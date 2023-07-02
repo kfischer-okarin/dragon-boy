@@ -71,6 +71,33 @@ def test_cpu_execute_operation_ld_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_ldd_a_into_pointer(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :LDD, arguments: [Operation::Pointer[:HL], :A])
+  registers.a = 0x12
+  registers.hl = 0x9FFF
+  memory[0x9FFF] = 0x56
+
+  cpu.execute operation
+
+  assert.equal! memory[0x9FFF], 0x12, 'Expected memory[0x9FFF] to be 0x12 but was 0x%02X' % memory[0x9FFF]
+  assert.equal! registers.hl, 0x9FFE, 'Expected HL to be 0x9FFE but was 0x%04X' % registers.hl
+end
+
+def test_cpu_execute_operation_ldd_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :LDD, arguments: [Operation::Pointer[:HL], :A] },
+      given: lambda { |registers, memory|
+        registers.a = 0x12
+        registers.hl = 0x9FFF
+      }
+    )
+  end
+end
+
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
@@ -143,11 +170,12 @@ module CPUTests
       @assert = assert
     end
 
-    def operation_will_not_change_any_flags(operation)
+    def operation_will_not_change_any_flags(operation, given: nil)
       all_flag_combinations.each do |flags|
         registers = Registers.new
         memory = Memory.new
         cpu = CPU.new registers: registers, memory: memory
+        given&.call(registers, memory)
         registers.flags = flags
 
         cpu.execute CPUTests.operation(operation)

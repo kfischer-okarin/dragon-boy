@@ -31,6 +31,12 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_LDD(operation)
+    @memory[@registers.hl] = @registers.a
+    @registers.hl -= 1
+    operation[:cycles]
+  end
+
   def execute_XOR(operation)
     @registers.a ^= @registers.send(operation[:arguments][1].downcase)
     @registers.flag_z = @registers.a.zero? ? 1 : 0
