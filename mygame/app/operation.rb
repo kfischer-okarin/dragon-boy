@@ -22,7 +22,11 @@ module Operation
               type: definition['mnemonic'].to_sym,
               arguments: definition['operands'].map { |operand|
                 if operand['immediate']
-                  operand['name'].to_sym
+                  if ('0'..'9').include? operand['name']
+                    operand['name'].to_i
+                  else
+                    operand['name'].to_sym
+                  end
                 else
                   Pointer[operand['name'].to_sym]
                 end

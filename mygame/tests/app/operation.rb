@@ -73,6 +73,11 @@
     name: :with_prefixed_opcode,
     program_code: "\xCB\x11",
     expected: { type: :RL, arguments: [:C] }
+  },
+  {
+    name: :BIT,
+    program_code: "\xCB\x40",
+    expected: { type: :BIT, arguments: [0, :B] }
   }
 ].each do |test_case|
   define_method "test_operation_parse_type_and_arguments_#{test_case[:name]}" do |_args, assert|
