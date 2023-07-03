@@ -6,6 +6,7 @@ require 'app/registers.rb'
 require 'app/screens/debugger.rb'
 require 'app/screens/rom_selection.rb'
 require 'app/ui/memory_view.rb'
+require 'app/ui/misc_info_view.rb'
 require 'app/ui/program_view.rb'
 require 'app/ui/registers_view.rb'
 

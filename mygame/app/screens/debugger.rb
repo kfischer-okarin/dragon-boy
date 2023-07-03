@@ -11,6 +11,7 @@ module Screens
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
       @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
+      @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
     end
 
     def tick(args)
@@ -51,6 +52,7 @@ module Screens
       @program_view.render(args.outputs)
       @registers_view.render(args.outputs)
       @memory_view.render(args.outputs)
+      @misc_info_view.render(args.outputs)
     end
   end
 end
