@@ -41,7 +41,7 @@ class Memory
   def memory_target(address)
     case address
     when 0xFF00..0xFF7F
-      @io
+      @io || @content
     else
       @content
     end

@@ -52,3 +52,11 @@ def test_memory_connect_io(_args, assert)
 
   assert.equal! io[0xFF7F], 0xBB
 end
+
+def test_memory_access_io_memory_without_connected_io(_args, assert)
+  memory = Memory.new
+
+  memory[0xFF00] = 0xBB
+
+  assert.equal! memory[0xFF00], 0xBB
+end
