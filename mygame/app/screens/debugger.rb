@@ -30,6 +30,7 @@ module Screens
           end
         end
       end
+      $screen = Screens::RomSelection.new(args) if args.inputs.keyboard.key_down.escape
 
       @program_view.update(args)
 
