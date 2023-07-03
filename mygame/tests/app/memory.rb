@@ -39,3 +39,16 @@ def test_memory_to_a(_args, assert)
   assert.equal! memory_array.length, memory.length
   assert.equal! memory_array[0...256], ("\xAA" * 256).bytes
 end
+
+def test_memory_connect_io(_args, assert)
+  memory = Memory.new
+  io = { 0xFF00 => 0xAA } # Anything with #[] and #[]= will do
+
+  memory.connect_io io
+
+  assert.equal! memory[0xFF00], 0xAA
+
+  memory[0xFF7F] = 0xBB
+
+  assert.equal! io[0xFF7F], 0xBB
+end

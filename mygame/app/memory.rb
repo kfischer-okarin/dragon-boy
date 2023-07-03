@@ -3,6 +3,7 @@ class Memory
     @rom = nil
     @boot_rom = nil
     @content = Array.new(length)
+    @io = nil
   end
 
   def load_rom(rom)
@@ -15,12 +16,16 @@ class Memory
     @content[0x0000..0x00FF] = @boot_rom
   end
 
+  def connect_io(io)
+    @io = io
+  end
+
   def [](address)
-    @content[address]
+    memory_target(address)[address]
   end
 
   def []=(address, value)
-    @content[address] = value
+    memory_target(address)[address] = value
   end
 
   def length
@@ -29,5 +34,16 @@ class Memory
 
   def to_a
     @content.dup
+  end
+
+  private
+
+  def memory_target(address)
+    case address
+    when 0xFF00..0xFF7F
+      @io
+    else
+      @content
+    end
   end
 end
