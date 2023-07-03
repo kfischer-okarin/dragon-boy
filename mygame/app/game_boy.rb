@@ -1,5 +1,5 @@
 class GameBoy
-  attr_reader :registers, :memory, :cpu
+  attr_reader :rom, :boot_rom, :registers, :memory, :cpu
 
   def initialize(rom, boot_rom: nil)
     @rom = rom

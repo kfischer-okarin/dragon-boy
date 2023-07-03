@@ -2,7 +2,7 @@ module UI
   class ProgramView
     HOVER_COLOR = { r: 255, g: 255, b: 0 }.freeze
 
-    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints
+    attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints, :comments
 
     attr_reader :hovered_operation
 
@@ -18,6 +18,7 @@ module UI
       @highlights = []
       @rendered_operations = []
       @breakpoints = {}
+      @comments = {}
     end
 
     def update(args)
@@ -75,6 +76,7 @@ module UI
           rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
           address: address,
           text: "#{operation[:type]} #{argument_strings.join(', ')}",
+          comment: @comments[address],
           operation: operation
         }
         address += operation[:length]
@@ -134,6 +136,12 @@ module UI
             x: x + 80, y: y, text: rendered_operation[:text]
           }.label!
         ]
+        if rendered_operation[:comment]
+          operation_primitives << {
+            x: x + 250, y: y, text: rendered_operation[:comment],
+            r: 100, g: 100, b: 100
+          }.label!
+        end
         if @breakpoints.key? address
           operation_primitives << {
             x: x + 60, y: y, text: 'B', r: 255, g: 0, b: 0

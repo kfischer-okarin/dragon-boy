@@ -8,6 +8,7 @@ module Screens
       registers_view_h = 250
       @program_view = UI::ProgramView.new(game_boy.memory, x: 0, y: 0, w: 640, h: 720)
       @program_view.offset = game_boy.registers.pc
+      @program_view.comments = load_comments(game_boy)
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
       @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
@@ -53,6 +54,17 @@ module Screens
       @registers_view.render(args.outputs)
       @memory_view.render(args.outputs)
       @misc_info_view.render(args.outputs)
+    end
+
+    private
+
+    def load_comments(game_boy)
+      result = {}
+      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
+      result.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
+      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
+      result.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
+      result
     end
   end
 end
