@@ -26,8 +26,12 @@ class CPU
   end
 
   def execute_LD(operation)
-    arguments = operation[:arguments]
-    @registers.send "#{arguments[0].downcase}=", arguments[1]
+    if operation[:arguments][0] == Operation::Pointer[:C]
+      @memory[0xFF00 + @registers.c] = @registers.send(operation[:arguments][1].downcase)
+    else
+      arguments = operation[:arguments]
+      @registers.send "#{arguments[0].downcase}=", arguments[1]
+    end
     operation[:cycles]
   end
 
