@@ -15,6 +15,11 @@ class GameBoyIO
     case address
     when 0xFF11
       @sound_channel1[:duty_cycle] = DUTY_CYCLES[value & 0b11000000]
+      # DIV-APU counter is increased at 512Hz (every 8192 CPU cycles)
+      # Every two increments of the DIV-APU counter, the length timer is decreased by one
+      # When the length timer reaches zero, the sound channel is disabled
+      # Therefore the length timer is in units of 1/256 seconds.
+      # (Length ranges from 0 - 1/4 seconds)
       @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
