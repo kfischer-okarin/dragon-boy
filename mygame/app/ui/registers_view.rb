@@ -18,7 +18,7 @@ module UI
       center_x = @x + (@w / 2)
       gtk_outputs.primitives << [
         { x: @x, y: @y, w: @w + 1, h: @h + 1, r: 0, g: 0, b: 0 }.border!,
-        { x: center_x, y: top - 10, text: 'Registers', size_enum: 2, alignment_enum: 1 }.label!,
+        { x: center_x, y: top - 10, text: 'Registers', size_enum: 2, alignment_enum: 1 }.label!
       ]
 
       render_8bit_registers(gtk_outputs, x: center_x - 40, top: top - 50)
