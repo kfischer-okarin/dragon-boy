@@ -4,6 +4,7 @@ module Screens
       args.state.debugger = args.state.new_entity(:debugger) do |state|
         state.game_boy = game_boy
         state.running = false
+        state.displayed_view = :memory
       end
       registers_view_h = 250
       @program_view = UI::ProgramView.new(game_boy.memory, x: 0, y: 0, w: 640, h: 720)
@@ -19,8 +20,34 @@ module Screens
       @state = args.state.debugger
       game_boy = @state.game_boy
 
-      @state.running = !@state.running if args.inputs.keyboard.key_down.enter
-      game_boy.cpu.execute_next_operation if args.inputs.keyboard.key_down.space
+      process_inputs(args)
+
+      @program_view.update(args)
+      @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+
+      @program_view.render(args.outputs)
+      @registers_view.render(args.outputs)
+      send "render_#{@state.displayed_view}_view", args
+      @misc_info_view.render(args.outputs)
+    end
+
+    private
+
+    def load_comments(game_boy)
+      result = {}
+      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
+      result.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
+      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
+      result.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
+      result
+    end
+
+    def process_inputs(args)
+      keyboard = args.inputs.keyboard
+      game_boy = @state.game_boy
+
+      @state.running = !@state.running if keyboard.key_down.enter
+      game_boy.cpu.execute_next_operation if keyboard.key_down.space
       if @state.running
         1000.times do
           game_boy.cpu.execute_next_operation
@@ -30,11 +57,12 @@ module Screens
           end
         end
       end
-      $screen = Screens::RomSelection.new(args) if args.inputs.keyboard.key_down.escape
+      $screen = Screens::RomSelection.new(args) if keyboard.key_down.escape
+    end
 
-      @program_view.update(args)
+    def render_memory_view(args)
+      game_boy = @state.game_boy
 
-      @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
       @memory_view.highlights = []
       @memory_view.highlights << {
         address: (@program_view.offset..@program_view.maximum_visible_address),
@@ -50,22 +78,7 @@ module Screens
         }
       end
       @memory_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
-
-      @program_view.render(args.outputs)
-      @registers_view.render(args.outputs)
       @memory_view.render(args.outputs)
-      @misc_info_view.render(args.outputs)
-    end
-
-    private
-
-    def load_comments(game_boy)
-      result = {}
-      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
-      result.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
-      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
-      result.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
-      result
     end
   end
 end
