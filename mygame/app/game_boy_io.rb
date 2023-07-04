@@ -15,6 +15,7 @@ class GameBoyIO
     case address
     when 0xFF11
       @sound_channel1[:duty_cycle] = DUTY_CYCLES[value & 0b11000000]
+      @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end

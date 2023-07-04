@@ -44,3 +44,15 @@ def test_io_sound_channel1_duty_cycle(_args, assert)
                   "Expected duty cycle to be #{test_case[:duty_cycle]} for 0b#{register_value.to_s(2)}"
   end
 end
+
+def test_io_sound_channel1_length_timer(_args, assert)
+  io = GameBoyIO.new
+
+  io[0xFF11] = 0b00000000
+
+  assert.equal! io.sound_channel1[:length_timer], 64
+
+  io[0xFF11] = 0b00111111
+
+  assert.equal! io.sound_channel1[:length_timer], 1
+end
