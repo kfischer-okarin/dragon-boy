@@ -11,8 +11,11 @@ module Screens
       @program_view.offset = game_boy.registers.pc
       @program_view.comments = load_comments(game_boy)
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
+
       @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
+      @sound_view = UI::SoundView.new(game_boy.io, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
+
       @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
     end
 
@@ -57,6 +60,13 @@ module Screens
           end
         end
       end
+
+      if keyboard.key_down.one
+        @state.displayed_view = :memory
+      elsif keyboard.key_down.two
+        @state.displayed_view = :sound
+      end
+
       $screen = Screens::RomSelection.new(args) if keyboard.key_down.escape
     end
 
@@ -79,6 +89,10 @@ module Screens
       end
       @memory_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
       @memory_view.render(args.outputs)
+    end
+
+    def render_sound_view(args)
+      @sound_view.render(args.outputs)
     end
   end
 end

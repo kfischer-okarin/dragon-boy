@@ -10,6 +10,7 @@ require 'app/ui/memory_view.rb'
 require 'app/ui/misc_info_view.rb'
 require 'app/ui/program_view.rb'
 require 'app/ui/registers_view.rb'
+require 'app/ui/sound_view.rb'
 
 def tick(args)
   setup(args) if args.tick_count.zero?
