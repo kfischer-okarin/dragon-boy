@@ -25,3 +25,22 @@ def test_io_turn_on_sound(_args, assert)
 
   assert.false! io.sound_on?
 end
+
+def test_io_sound_channel1_duty_cycle(_args, assert)
+  io = GameBoyIO.new
+
+  [
+    { bit76: 0b00, duty_cycle: 0.125 },
+    { bit76: 0b01, duty_cycle: 0.25 },
+    { bit76: 0b10, duty_cycle: 0.5 },
+    { bit76: 0b11, duty_cycle: 0.75 }
+  ].each do |test_case|
+    register_value = test_case[:bit76] << 6
+
+    io[0xFF11] = register_value
+
+    assert.equal! io.sound_channel1[:duty_cycle],
+                  test_case[:duty_cycle],
+                  "Expected duty cycle to be #{test_case[:duty_cycle]} for 0b#{register_value.to_s(2)}"
+  end
+end
