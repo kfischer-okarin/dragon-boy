@@ -41,6 +41,17 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_INC(operation)
+    register = operation[:arguments][0].downcase
+    result = @registers.send(register) + 1 & 0xFF
+    @registers.send "#{register}=", result
+
+    @registers.flag_z = result.zero? ? 1 : 0
+    @registers.flag_n = 0
+    @registers.flag_h = (@registers.send(register) & 0xF).zero? ? 1 : 0
+    operation[:cycles]
+  end
+
   def execute_JR(operation)
     if condition_fulfilled? operation[:arguments][0]
       @registers.pc += operation[:arguments][1]

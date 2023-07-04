@@ -111,6 +111,60 @@ def test_cpu_execute_operation_ldd_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_inc_8bit_register(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :INC, arguments: [:C])
+  registers.c = 0x12
+
+  cpu.execute operation
+
+  assert.equal! registers.c, 0x13
+
+  registers.c = 0xFF
+
+  cpu.execute operation
+
+  assert.equal! registers.c, 0x00
+end
+
+def test_cpu_execute_operation_inc_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    argument_that_results_not_in_zero = lambda { |registers, _memory|
+      registers.e = 0b00100010
+    }
+    operation_will_set_flags(
+      { type: :INC, arguments: [:E] },
+      to: { z: 0, n: 0, h: 0 },
+      given: argument_that_results_not_in_zero
+    )
+
+    argument_that_results_in_zero = lambda { |registers, _memory|
+      registers.e = 0b11111111
+    }
+    operation_will_set_flags(
+      { type: :INC, arguments: [:E] },
+      to: { z: 1, n: 0, h: 1 }, # bit 3 will overflow into bit 4 so h will be set
+      given: argument_that_results_in_zero
+    )
+
+    argument_that_results_in_half_carry = lambda { |registers, _memory|
+      registers.e = 0b00001111
+    }
+    operation_will_set_flags(
+      { type: :INC, arguments: [:E] },
+      to: { h: 1 },
+      given: argument_that_results_in_half_carry
+    )
+
+    operation_will_ignore_flags(
+      { type: :INC, arguments: [:E] },
+      [:c]
+    )
+  end
+end
+
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
