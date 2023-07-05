@@ -1,11 +1,12 @@
 class GameBoyIO
-  attr_reader :sound_channel1, :sound_channel2, :sound_channel4
+  attr_reader :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
 
   def initialize
     @values = {}
     @sound_on = nil
     @sound_channel1 = {}
     @sound_channel2 = {}
+    @sound_channel3 = {}
     @sound_channel4 = {}
   end
 
@@ -38,6 +39,11 @@ class GameBoyIO
       # Even if the volume reaches 0, the channel is not disabled.
       # A timer value of 0 disables the envelope.
       channel[:envelope_sweep_timer] = value & 0b00000111
+    when 0xFF25
+      @sound_channel1[:panning] = panning(value, 0b00010000, 0b00000001)
+      @sound_channel2[:panning] = panning(value, 0b00100000, 0b00000010)
+      @sound_channel3[:panning] = panning(value, 0b01000000, 0b00000100)
+      @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end
@@ -67,6 +73,19 @@ class GameBoyIO
       @sound_channel2
     when 0xFF21
       @sound_channel4
+    end
+  end
+
+  def panning(value, left_mask, right_mask)
+    case value & (left_mask | right_mask)
+    when left_mask
+      :left
+    when right_mask
+      :right
+    when 0
+      :off
+    else
+      :center
     end
   end
 end

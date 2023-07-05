@@ -153,3 +153,14 @@ def test_io_sound_channel_envelope_sweep_timer(_args, assert)
     end
   end
 end
+
+def test_io_sound_channel_panning(_args, assert)
+  io = GameBoyIO.new
+
+  io[0xFF25] = 0b10100110
+
+  assert.equal! io.sound_channel1[:panning], :off, 'Expected sound channel 1 panning to be :off'
+  assert.equal! io.sound_channel2[:panning], :center, 'Expected sound channel 2 panning to be :center'
+  assert.equal! io.sound_channel3[:panning], :right, 'Expected sound channel 3 panning to be :right'
+  assert.equal! io.sound_channel4[:panning], :left, 'Expected sound channel 4 panning to be :left'
+end
