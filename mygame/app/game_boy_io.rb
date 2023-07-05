@@ -1,10 +1,12 @@
 class GameBoyIO
-  attr_reader :sound_channel1
+  attr_reader :sound_channel1, :sound_channel2, :sound_channel4
 
   def initialize
     @values = {}
     @sound_on = nil
     @sound_channel1 = {}
+    @sound_channel2 = {}
+    @sound_channel4 = {}
   end
 
   def [](address)
@@ -21,9 +23,9 @@ class GameBoyIO
       # Therefore the length timer is in units of 1/256 seconds.
       # (Length ranges from 0 - 1/4 seconds)
       @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
-    when 0xFF12
+    when 0xFF12, 0xFF17, 0xFF21
       # Volume is in units of 1/15
-      @sound_channel1[:volume] = ((value & 0b11110000) >> 4) / 15.0
+      sound_channel(address)[:volume] = ((value & 0b11110000) >> 4) / 15.0
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end
@@ -41,5 +43,18 @@ class GameBoyIO
     raise 'Sound status uninitialized' if @sound_on.nil?
 
     @sound_on
+  end
+
+  private
+
+  def sound_channel(address)
+    case address
+    when 0xFF12
+      @sound_channel1
+    when 0xFF17
+      @sound_channel2
+    when 0xFF21
+      @sound_channel4
+    end
   end
 end
