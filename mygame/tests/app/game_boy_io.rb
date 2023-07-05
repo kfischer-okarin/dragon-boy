@@ -81,3 +81,27 @@ def test_io_sound_channel_volume(_args, assert)
     end
   end
 end
+
+def test_io_sound_channel_envelope_direction(_args, assert)
+  io = GameBoyIO.new
+
+  [
+    { address: 0xFF12, channel: :sound_channel1 },
+    { address: 0xFF17, channel: :sound_channel2 },
+    { address: 0xFF21, channel: :sound_channel4 }
+  ].each do |channel|
+    [
+      { bit3: 0, value: -1 },
+      { bit3: 1, value: 1 }
+    ].each do |test_case|
+      register_value = test_case[:bit3] << 3
+
+      io[channel[:address]] = register_value
+
+      sound_channel = io.send(channel[:channel])
+      assert.equal! sound_channel[:envelope_direction],
+                    test_case[:value],
+                    "Expected envelope direction to be #{test_case[:value]} for 0b#{register_value.to_s(2)}"
+    end
+  end
+end

@@ -24,8 +24,10 @@ class GameBoyIO
       # (Length ranges from 0 - 1/4 seconds)
       @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
     when 0xFF12, 0xFF17, 0xFF21
+      channel = sound_channel(address)
       # Volume is in units of 1/15
-      sound_channel(address)[:volume] = ((value & 0b11110000) >> 4) / 15.0
+      channel[:volume] = ((value & 0b11110000) >> 4) / 15.0
+      channel[:envelope_direction] = (value & 0b00001000).zero? ? -1 : 1
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end
