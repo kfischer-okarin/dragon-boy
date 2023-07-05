@@ -21,6 +21,9 @@ class GameBoyIO
       # Therefore the length timer is in units of 1/256 seconds.
       # (Length ranges from 0 - 1/4 seconds)
       @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
+    when 0xFF12
+      # Volume is in units of 1/15
+      @sound_channel1[:volume] = ((value & 0b11110000) >> 4) / 15.0
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end
