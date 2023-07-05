@@ -18,16 +18,25 @@ class GameBoyIO
     when 0xFF11
       @sound_channel1[:duty_cycle] = DUTY_CYCLES[value & 0b11000000]
       # DIV-APU counter is increased at 512Hz (every 8192 CPU cycles)
-      # Every two increments of the DIV-APU counter, the length timer is decreased by one
+      # Every two increments of the DIV-APU counter (i.e. every 1/256 s),
+      # the length timer is decreased by one.
       # When the length timer reaches zero, the sound channel is disabled
-      # Therefore the length timer is in units of 1/256 seconds.
-      # (Length ranges from 0 - 1/4 seconds)
+      # Thus the effective length ranges from 0 - 1/4 seconds.
       @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
     when 0xFF12, 0xFF17, 0xFF21
       channel = sound_channel(address)
       # Volume is in units of 1/15
       channel[:volume] = ((value & 0b11110000) >> 4) / 15.0
       channel[:envelope_direction] = (value & 0b00001000).zero? ? -1 : 1
+      # DIV-APU counter is increased at 512Hz (every 8192 CPU cycles)
+      # Every 8 increments of the DIV-APU counter (every 1/64 second),
+      # the timer is decreased by one.
+      # Thus the effective sweep period ranges from 1/64 to 7/64 seconds.
+      # When it reaches zero, volume is increased/decreased by one to
+      # a minimum of 0 and a maximum of 15.
+      # Even if the volume reaches 0, the channel is not disabled.
+      # A timer value of 0 disables the envelope.
+      channel[:envelope_sweep_timer] = value & 0b00000111
     when 0xFF26
       @sound_on = value & 0b10000000 != 0
     end

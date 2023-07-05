@@ -105,3 +105,28 @@ def test_io_sound_channel_envelope_direction(_args, assert)
     end
   end
 end
+
+def test_io_sound_channel_envelope_sweep_timer(_args, assert)
+  io = GameBoyIO.new
+
+  [
+    { address: 0xFF12, channel: :sound_channel1 },
+    { address: 0xFF17, channel: :sound_channel2 },
+    { address: 0xFF21, channel: :sound_channel4 }
+  ].each do |channel|
+    [
+      { bit210: 0b111, value: 7 },
+      { bit210: 0b000, value: 0 },
+      { bit210: 0b010, value: 2 }
+    ].each do |test_case|
+      register_value = test_case[:bit210]
+
+      io[channel[:address]] = register_value
+
+      sound_channel = io.send(channel[:channel])
+      assert.equal! sound_channel[:envelope_sweep_timer],
+                    test_case[:value],
+                    "Expected sweep timer to be #{test_case[:value]} for 0b#{register_value.to_s(2)}"
+    end
+  end
+end
