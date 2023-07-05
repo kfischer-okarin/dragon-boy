@@ -15,14 +15,15 @@ class GameBoyIO
 
   def []=(address, value)
     case address
-    when 0xFF11
-      @sound_channel1[:duty_cycle] = DUTY_CYCLES[value & 0b11000000]
+    when 0xFF11, 0xFF16
+      channel = sound_channel(address)
+      channel[:duty_cycle] = DUTY_CYCLES[value & 0b11000000]
       # DIV-APU counter is increased at 512Hz (every 8192 CPU cycles)
       # Every two increments of the DIV-APU counter (i.e. every 1/256 s),
       # the length timer is decreased by one.
       # When the length timer reaches zero, the sound channel is disabled
       # Thus the effective length ranges from 0 - 1/4 seconds.
-      @sound_channel1[:length_timer] = 64 - (value & 0b00111111)
+      channel[:length_timer] = 64 - (value & 0b00111111)
     when 0xFF12, 0xFF17, 0xFF21
       channel = sound_channel(address)
       # Volume is in units of 1/15
@@ -60,9 +61,9 @@ class GameBoyIO
 
   def sound_channel(address)
     case address
-    when 0xFF12
+    when 0xFF11, 0xFF12
       @sound_channel1
-    when 0xFF17
+    when 0xFF16, 0xFF17
       @sound_channel2
     when 0xFF21
       @sound_channel4

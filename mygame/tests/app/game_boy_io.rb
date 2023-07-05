@@ -30,31 +30,54 @@ def test_io_sound_channel1_duty_cycle(_args, assert)
   io = GameBoyIO.new
 
   [
-    { bit76: 0b00, duty_cycle: 0.125 },
-    { bit76: 0b01, duty_cycle: 0.25 },
-    { bit76: 0b10, duty_cycle: 0.5 },
-    { bit76: 0b11, duty_cycle: 0.75 }
-  ].each do |test_case|
-    register_value = test_case[:bit76] << 6
+    { address: 0xFF11, channel: :sound_channel1 },
+    { address: 0xFF16, channel: :sound_channel2 }
+  ].each do |channel|
+    [
+      { bit76: 0b00, duty_cycle: 0.125 },
+      { bit76: 0b01, duty_cycle: 0.25 },
+      { bit76: 0b10, duty_cycle: 0.5 },
+      { bit76: 0b11, duty_cycle: 0.75 }
+    ].each do |test_case|
+      address = channel[:address]
+      sound_channel = io.send(channel[:channel])
 
-    io[0xFF11] = register_value
+      register_value = test_case[:bit76] << 6
 
-    assert.equal! io.sound_channel1[:duty_cycle],
-                  test_case[:duty_cycle],
-                  "Expected duty cycle to be #{test_case[:duty_cycle]} for 0b#{register_value.to_s(2)}"
+      io[address] = register_value
+
+      assert.equal! sound_channel[:duty_cycle],
+                    test_case[:duty_cycle],
+                    "Expected duty cycle of #{channel[:channel]} to be #{test_case[:duty_cycle]}" \
+                    "for register value %04X = 0b#{register_value.to_s(2)}" % address
+    end
   end
 end
 
-def test_io_sound_channel1_length_timer(_args, assert)
+def test_io_sound_channel_length_timer(_args, assert)
   io = GameBoyIO.new
 
-  io[0xFF11] = 0b00000000
+  [
+    { address: 0xFF11, channel: :sound_channel1 },
+    { address: 0xFF16, channel: :sound_channel2 }
+  ].each do |channel|
+    address = channel[:address]
+    sound_channel = io.send(channel[:channel])
 
-  assert.equal! io.sound_channel1[:length_timer], 64
+    io[address] = 0b00000000
 
-  io[0xFF11] = 0b00111111
+    assert.equal! sound_channel[:length_timer],
+                  64,
+                  "Expected length timer of #{channel[:channel]} to be 64 for " \
+                  'register value %04X = 0b00000000' % address
 
-  assert.equal! io.sound_channel1[:length_timer], 1
+    io[address] = 0b00111111
+
+    assert.equal! sound_channel[:length_timer],
+                  1,
+                  "Expected length timer of #{channel[:channel]} to be 1 for " \
+                  'register value %02X = 0b00111111' % address
+  end
 end
 
 def test_io_sound_channel_volume(_args, assert)
