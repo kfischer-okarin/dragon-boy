@@ -49,7 +49,7 @@ def test_io_sound_channel1_duty_cycle(_args, assert)
       assert.equal! sound_channel[:duty_cycle],
                     test_case[:duty_cycle],
                     "Expected duty cycle of #{channel[:channel]} to be #{test_case[:duty_cycle]}" \
-                    "for register value %04X = 0b#{register_value.to_s(2)}" % address
+                    'for register value %04X = %#0.8b' % [address, register_value]
     end
   end
 end
@@ -100,7 +100,8 @@ def test_io_sound_channel_volume(_args, assert)
       sound_channel = io.send(channel[:channel])
       assert.equal! sound_channel[:volume],
                     test_case[:volume],
-                    "Expected volume to be #{test_case[:volume]} for 0b#{register_value.to_s(2)}"
+                    "Expected volume to be #{test_case[:volume]} " \
+                    'for register value %04X = %#0.8b' % [channel[:address], register_value]
     end
   end
 end
@@ -124,7 +125,8 @@ def test_io_sound_channel_envelope_direction(_args, assert)
       sound_channel = io.send(channel[:channel])
       assert.equal! sound_channel[:envelope_direction],
                     test_case[:value],
-                    "Expected envelope direction to be #{test_case[:value]} for 0b#{register_value.to_s(2)}"
+                    "Expected envelope direction to be #{test_case[:value]} " \
+                    'for register value %04X = %#0.8b' % [channel[:address], register_value]
     end
   end
 end
@@ -149,7 +151,8 @@ def test_io_sound_channel_envelope_sweep_timer(_args, assert)
       sound_channel = io.send(channel[:channel])
       assert.equal! sound_channel[:envelope_sweep_timer],
                     test_case[:value],
-                    "Expected sweep timer to be #{test_case[:value]} for 0b#{register_value.to_s(2)}"
+                    "Expected sweep timer to be #{test_case[:value]} " \
+                    'for register value %04X = %#0.8b' % [channel[:address], register_value]
     end
   end
 end
