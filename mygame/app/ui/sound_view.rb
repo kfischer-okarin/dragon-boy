@@ -26,7 +26,7 @@ module UI
 
       y -= 40
       gtk_outputs.primitives << {
-        x: left_column_x, y: y, text: "Sound System Status: #{fetch_value { @io.sound_on? ? 'ON' : 'OFF' }}"
+        x: left_column_x, y: y, text: "Sound: #{@io.sound[:enabled] ? 'ON' : 'OFF'}"
       }.label!
 
       y -= 40

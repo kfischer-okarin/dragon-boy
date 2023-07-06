@@ -1,9 +1,9 @@
 class GameBoyIO
-  attr_reader :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
+  attr_reader :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
 
   def initialize
     @values = {}
-    @sound_on = nil
+    @sound = {}
     @sound_channel1 = {}
     @sound_channel2 = {}
     @sound_channel3 = {}
@@ -45,7 +45,7 @@ class GameBoyIO
       @sound_channel3[:panning] = panning(value, 0b01000000, 0b00000100)
       @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
-      @sound_on = value & 0b10000000 != 0
+      @sound[:enabled] = value & 0b10000000 != 0
     end
     @values[address] = value
   end
@@ -56,12 +56,6 @@ class GameBoyIO
     0b10000000 => 0.5,
     0b11000000 => 0.75
   }.freeze
-
-  def sound_on?
-    raise 'Sound status uninitialized' if @sound_on.nil?
-
-    @sound_on
-  end
 
   private
 
