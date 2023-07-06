@@ -27,14 +27,23 @@ class CPU
 
   def execute_LD(operation)
     target = operation[:arguments][0]
+    source = operation[:arguments][1]
+    value = case source
+            when Operation::Pointer
+              @memory[@registers.send(source.address.downcase)]
+            when Symbol
+              @registers.send(source.downcase)
+            else
+              source
+            end
+
     case target
     when Operation::Pointer
       address = @registers.send(target.address.downcase)
       address += 0xFF00 if target.address == :C
-      @memory[address] = @registers.send(operation[:arguments][1].downcase)
+      @memory[address] = value
     else
-      arguments = operation[:arguments]
-      @registers.send "#{target.downcase}=", arguments[1]
+      @registers.send "#{target.downcase}=", value
     end
     operation[:cycles]
   end
