@@ -26,7 +26,8 @@ module UI
 
       y -= 40
       gtk_outputs.primitives << {
-        x: left_column_x, y: y, text: "Sound: #{@io.sound[:enabled] ? 'ON' : 'OFF'}"
+        x: left_column_x, y: y,
+        text: "Sound: #{@io.sound[:enabled] ? 'ON' : 'OFF'} - Volume: #{@io.sound[:volume_left]} / #{@io.sound[:volume_right] }"
       }.label!
 
       y -= 40

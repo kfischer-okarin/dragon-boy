@@ -40,6 +40,9 @@ class GameBoyIO
       # A timer value of 0 disables the envelope.
       channel[:envelope_sweep_timer] = value & 0b00000111
     when 0xFF24
+      # Bit 7 and 3 are for VIN panning (not implemented)
+
+      # Volume is in units of 1/8. Range is 1/8 to 1.
       @sound[:volume_left] = (((value & 0b01110000) >> 4) + 1) / 8.0
       @sound[:volume_right] = ((value & 0b00000111) + 1) / 8.0
     when 0xFF25
