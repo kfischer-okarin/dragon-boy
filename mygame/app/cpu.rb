@@ -39,6 +39,16 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_LDH(operation)
+    target = operation[:arguments][0]
+    case target
+    when Operation::Pointer
+      address = 0xFF00 + target.address
+      @memory[address] = @registers.a
+    end
+    operation[:cycles]
+  end
+
   def execute_LDD(operation)
     @memory[@registers.hl] = @registers.a
     @registers.hl -= 1
