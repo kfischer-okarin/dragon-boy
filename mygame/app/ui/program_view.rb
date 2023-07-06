@@ -37,6 +37,10 @@ module UI
       render_operations(gtk_outputs)
     end
 
+    def address_visible?(address)
+      address >= @offset && address <= maximum_visible_address
+    end
+
     def maximum_visible_address
       @rendered_operations.last[:address] + @rendered_operations.last[:operation][:length] - 1
     end

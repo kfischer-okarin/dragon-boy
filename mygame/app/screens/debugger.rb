@@ -50,6 +50,7 @@ module Screens
       keyboard = args.inputs.keyboard
       game_boy = @state.game_boy
 
+      pc_before = @state.game_boy.registers.pc
       @state.running = !@state.running if keyboard.key_down.enter
       game_boy.cpu.execute_next_operation if keyboard.key_down.space
       if @state.running
@@ -61,6 +62,8 @@ module Screens
           end
         end
       end
+
+      scroll_to_pc_if_needed if @state.game_boy.registers.pc != pc_before
 
       if keyboard.key_down.one
         @state.displayed_view = :memory
@@ -100,6 +103,12 @@ module Screens
 
     def render_vram_view(args)
       @vram_view.render(args.outputs)
+    end
+
+    def scroll_to_pc_if_needed
+      pc = @state.game_boy.registers.pc
+      @program_view.offset = pc unless @program_view.address_visible? pc
+      @memory_view.offset = pc & 0xFFF0 unless @memory_view.address_visible? pc
     end
   end
 end

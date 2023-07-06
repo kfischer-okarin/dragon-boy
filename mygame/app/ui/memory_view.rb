@@ -32,6 +32,10 @@ module UI
       @offset &= 0xFFF0 # Align to 16-byte boundary
     end
 
+    def address_visible?(address)
+      address >= @offset && address <= maximum_visible_address
+    end
+
     private
 
     def render_bytes(gtk_outputs)
