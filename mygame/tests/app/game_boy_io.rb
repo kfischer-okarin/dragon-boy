@@ -177,3 +177,11 @@ def test_io_sound_master_volume(_args, assert)
   assert.equal! io.sound[:volume_left], 0.875
   assert.equal! io.sound[:volume_right], 0.375
 end
+
+def test_io_palettes_bg(_args, assert)
+  io = GameBoyIO.new
+
+  io[0xFF47] = 0b11010010
+
+  assert.equal! io.palettes[:bg], [:dark_gray, :white, :light_gray, :black]
+end

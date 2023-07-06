@@ -1,8 +1,9 @@
 class GameBoyIO
-  attr_reader :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
+  attr_reader :palettes, :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
 
   def initialize
     @values = {}
+    @palettes = {}
     @sound = {}
     @sound_channel1 = {}
     @sound_channel2 = {}
@@ -52,6 +53,13 @@ class GameBoyIO
       @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
       @sound[:enabled] = value & 0b10000000 != 0
+    when 0xFF47
+      @palettes[:bg] = [
+        palette_color(value & 0b00000011),
+        palette_color((value & 0b00001100) >> 2),
+        palette_color((value & 0b00110000) >> 4),
+        palette_color((value & 0b11000000) >> 6)
+      ]
     end
     @values[address] = value
   end
@@ -86,6 +94,19 @@ class GameBoyIO
       :off
     else
       :center
+    end
+  end
+
+  def palette_color(value)
+    case value
+    when 0b00
+      :white
+    when 0b01
+      :light_gray
+    when 0b10
+      :dark_gray
+    when 0b11
+      :black
     end
   end
 end
