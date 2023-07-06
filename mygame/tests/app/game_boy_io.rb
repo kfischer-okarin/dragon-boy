@@ -163,3 +163,17 @@ def test_io_sound_channel_panning(_args, assert)
   assert.equal! io.sound_channel3[:panning], :right, 'Expected sound channel 3 panning to be :right'
   assert.equal! io.sound_channel4[:panning], :left, 'Expected sound channel 4 panning to be :left'
 end
+
+def test_io_sound_master_volume(_args, assert)
+  io = GameBoyIO.new
+
+  io[0xFF24] = 0b01110000
+
+  assert.equal! io.sound[:volume_left], 1.0
+  assert.equal! io.sound[:volume_right], 0.125
+
+  io[0xFF24] = 0b01100010
+
+  assert.equal! io.sound[:volume_left], 0.875
+  assert.equal! io.sound[:volume_right], 0.375
+end

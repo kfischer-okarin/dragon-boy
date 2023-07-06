@@ -39,6 +39,9 @@ class GameBoyIO
       # Even if the volume reaches 0, the channel is not disabled.
       # A timer value of 0 disables the envelope.
       channel[:envelope_sweep_timer] = value & 0b00000111
+    when 0xFF24
+      @sound[:volume_left] = (((value & 0b01110000) >> 4) + 1) / 8.0
+      @sound[:volume_right] = ((value & 0b00000111) + 1) / 8.0
     when 0xFF25
       @sound_channel1[:panning] = panning(value, 0b00010000, 0b00000001)
       @sound_channel2[:panning] = panning(value, 0b00100000, 0b00000010)
