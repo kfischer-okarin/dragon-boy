@@ -75,6 +75,12 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_CALL(operation)
+    push((@registers.pc & 0xFF00) >> 8)
+    push(@registers.pc & 0x00FF)
+    @registers.pc = operation[:arguments][0]
+  end
+
   def execute_JR(operation)
     if condition_fulfilled? operation[:arguments][0]
       @registers.pc += operation[:arguments][1]
@@ -113,5 +119,10 @@ class CPU
     when :C
       @registers.flag_c == 1
     end
+  end
+
+  def push(value)
+    @registers.sp -= 1
+    @memory[@registers.sp] = value
   end
 end

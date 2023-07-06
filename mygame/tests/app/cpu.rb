@@ -245,6 +245,22 @@ def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_call(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :CALL, arguments: [0x0095], length: 3)
+  registers.pc = 0x0120
+  registers.sp = 0xFFFE
+
+  cpu.execute operation
+
+  assert.equal! registers.pc, 0x0095
+  assert.equal! registers.sp, 0xFFFC
+  assert.equal! memory[0xFFFC], 0x23 # high byte of return address
+  assert.equal! memory[0xFFFD], 0x01
+end
+
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
