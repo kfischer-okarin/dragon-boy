@@ -107,7 +107,7 @@ class CPU
   def execute_RL(operation)
     register = operation[:arguments][0].downcase
     value = @registers.send(register)
-    result = (value << 1) | @registers.flag_c
+    result = ((value << 1) | @registers.flag_c) & 0xFF
     @registers.send("#{register}=", result)
     @registers.flag_c = (value & 0b10000000) >> 7
     @registers.flag_z = result.zero? ? 1 : 0

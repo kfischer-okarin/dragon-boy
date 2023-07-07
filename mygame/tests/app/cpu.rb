@@ -319,13 +319,13 @@ def test_cpu_execute_operation_rl_on_register(_args, assert)
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
   operation = CPUTests.operation(type: :RL, arguments: [:C])
-  registers.c = 0b00110100
+  registers.c = 0b10110100
   registers.flag_c = 1
 
   cpu.execute operation
 
   assert.equal! registers.c, 0b01101001
-  assert.equal! registers.flag_c, 0
+  assert.equal! registers.flag_c, 1
 end
 
 def test_cpu_execute_operation_rl_flags(_args, assert)
