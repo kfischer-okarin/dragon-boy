@@ -385,8 +385,8 @@ module CPUTests
         registers = Registers.new
         memory = Memory.new
         cpu = CPU.new registers: registers, memory: memory
-        given&.call(registers, memory)
         registers.flags = flags
+        given&.call(registers, memory)
 
         cpu.execute CPUTests.operation(operation)
 
@@ -403,8 +403,8 @@ module CPUTests
         registers = Registers.new
         memory = Memory.new
         cpu = CPU.new registers: registers, memory: memory
-        given&.call(registers, memory)
         registers.flags = flags
+        given&.call(registers, memory)
 
         cpu.execute CPUTests.operation(operation)
 
