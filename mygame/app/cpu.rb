@@ -78,6 +78,7 @@ class CPU
   def execute_CALL(operation)
     push_16bit_value @registers.pc
     @registers.pc = operation[:arguments][0]
+    operation[:cycles]
   end
 
   def execute_PUSH(operation)
