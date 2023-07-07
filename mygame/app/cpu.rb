@@ -76,9 +76,13 @@ class CPU
   end
 
   def execute_CALL(operation)
-    push((@registers.pc & 0xFF00) >> 8)
-    push(@registers.pc & 0x00FF)
+    push_16bit_value @registers.pc
     @registers.pc = operation[:arguments][0]
+  end
+
+  def execute_PUSH(operation)
+    push_16bit_value @registers.send(operation[:arguments][0].downcase)
+    operation[:cycles]
   end
 
   def execute_JR(operation)
@@ -119,6 +123,11 @@ class CPU
     when :C
       @registers.flag_c == 1
     end
+  end
+
+  def push_16bit_value(value)
+    push((value & 0xFF00) >> 8)
+    push(value & 0x00FF)
   end
 
   def push(value)
