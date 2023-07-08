@@ -374,6 +374,35 @@ def test_cpu_execute_operation_call_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_ret(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :RET, arguments: [])
+  registers.pc = 0x0120
+  registers.sp = 0xFFFC
+  memory[0xFFFC] = 0x45
+  memory[0xFFFD] = 0x03
+
+  cpu.execute operation
+
+  assert.equal! registers.pc, 0x0345
+  assert.equal! registers.sp, 0xFFFE
+end
+
+def test_cpu_execute_operation_ret_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :RET, arguments: [] },
+      given: lambda { |registers, memory|
+        registers.sp = 0xFFFC
+        memory[0xFFFC] = 0x45
+        memory[0xFFFD] = 0x03
+      }
+    )
+  end
+end
+
 def test_cpu_execute_operation_push_register(_args, assert)
   registers = Registers.new
   memory = Memory.new

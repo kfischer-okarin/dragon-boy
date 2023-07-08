@@ -104,6 +104,11 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_RET(operation)
+    @registers.pc = pop_16bit_value
+    operation[:cycles]
+  end
+
   def execute_PUSH(operation)
     push_16bit_value @registers.send(operation[:arguments][0].downcase)
     operation[:cycles]
