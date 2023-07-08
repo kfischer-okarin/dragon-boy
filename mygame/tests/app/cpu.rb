@@ -288,6 +288,34 @@ def test_cpu_execute_operation_push_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_pop_register(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :POP, arguments: [:BC])
+  registers.sp = 0xFFFC
+  memory[0xFFFC] = 0x34
+  memory[0xFFFD] = 0x12
+
+  cpu.execute operation
+
+  assert.equal! registers.sp, 0xFFFE
+  assert.equal! registers.bc, 0x1234
+end
+
+def test_cpu_execute_operation_pop_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :POP, arguments: [:BC] },
+      given: lambda { |registers, memory|
+        registers.sp = 0xFFFC
+        memory[0xFFFC] = 0x34
+        memory[0xFFFD] = 0x12
+      }
+    )
+  end
+end
+
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   registers = Registers.new
   memory = Memory.new

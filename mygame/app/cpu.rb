@@ -86,6 +86,12 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_POP(operation)
+    value = pop_16bit_value
+    @registers.send "#{operation[:arguments][0].downcase}=", value
+    operation[:cycles]
+  end
+
   def execute_JR(operation)
     if condition_fulfilled? operation[:arguments][0]
       @registers.pc += operation[:arguments][1]
@@ -151,5 +157,15 @@ class CPU
   def push(value)
     @registers.sp -= 1
     @memory[@registers.sp] = value
+  end
+
+  def pop_16bit_value
+    pop + (pop << 8)
+  end
+
+  def pop
+    result = @memory[@registers.sp]
+    @registers.sp += 1
+    result
   end
 end
