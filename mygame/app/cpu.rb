@@ -58,6 +58,12 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_LDI(operation)
+    @memory[@registers.hl] = @registers.a
+    @registers.hl += 1
+    operation[:cycles]
+  end
+
   def execute_LDD(operation)
     @memory[@registers.hl] = @registers.a
     @registers.hl -= 1
