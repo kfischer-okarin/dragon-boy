@@ -349,6 +349,41 @@ def test_cpu_execute_operation_rl_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_rla(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :RLA, arguments: [])
+  registers.a = 0b10110100
+  registers.flag_c = 1
+
+  cpu.execute operation
+
+  assert.equal! registers.a, 0b01101001
+  assert.equal! registers.flag_c, 1
+end
+
+def test_cpu_execute_operation_rl_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_set_flags(
+      { type: :RLA, arguments: [] },
+      to: { c: 1, z: 0, n: 0, h: 0 },
+      given: lambda { |registers, _memory|
+        registers.a = 0b10000000
+        registers.flag_c = 1
+      }
+    )
+    operation_will_set_flags(
+      { type: :RLA, arguments: [] },
+      to: { c: 0, z: 1, n: 0, h: 0 },
+      given: lambda { |registers, _memory|
+        registers.a = 0b00000000
+        registers.flag_c = 0
+      }
+    )
+  end
+end
+
 def test_cpu_execute_operation_bit_on_register(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_set_flags(

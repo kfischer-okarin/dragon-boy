@@ -104,6 +104,11 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_RLA(operation)
+    execute_RL operation.merge(arguments: [:A])
+    operation[:cycles]
+  end
+
   def execute_RL(operation)
     register = operation[:arguments][0].downcase
     value = @registers.send(register)
