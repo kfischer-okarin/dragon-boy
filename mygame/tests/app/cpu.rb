@@ -545,7 +545,7 @@ def test_cpu_execute_operation_rla(_args, assert)
   assert.equal! registers.flag_c, 1
 end
 
-def test_cpu_execute_operation_rl_flags(_args, assert)
+def test_cpu_execute_operation_rla_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_set_flags(
       { type: :RLA, arguments: [] },
