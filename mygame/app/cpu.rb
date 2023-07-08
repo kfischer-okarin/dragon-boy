@@ -71,7 +71,19 @@ class CPU
 
     @registers.flag_z = result.zero? ? 1 : 0
     @registers.flag_n = 0
-    @registers.flag_h = (@registers.send(register) & 0xF).zero? ? 1 : 0
+    @registers.flag_h = (result & 0xF).zero? ? 1 : 0
+    operation[:cycles]
+  end
+
+  def execute_DEC(operation)
+    register = operation[:arguments][0].downcase
+    old_value = @registers.send(register)
+    result = old_value - 1 & 0xFF
+    @registers.send "#{register}=", result
+
+    @registers.flag_z = result.zero? ? 1 : 0
+    @registers.flag_n = 1
+    @registers.flag_h = (old_value & 0xF).zero? ? 1 : 0
     operation[:cycles]
   end
 

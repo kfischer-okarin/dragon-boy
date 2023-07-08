@@ -209,6 +209,60 @@ def test_cpu_execute_operation_inc_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_decc_8bit_register(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :DEC, arguments: [:C])
+  registers.c = 0x12
+
+  cpu.execute operation
+
+  assert.equal! registers.c, 0x11
+
+  registers.c = 0x00
+
+  cpu.execute operation
+
+  assert.equal! registers.c, 0xFF
+end
+
+def test_cpu_execute_operation_dec_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    argument_that_results_not_in_zero = lambda { |registers, _memory|
+      registers.e = 0b00100010
+    }
+    operation_will_set_flags(
+      { type: :DEC, arguments: [:E] },
+      to: { z: 0, n: 1, h: 0 },
+      given: argument_that_results_not_in_zero
+    )
+
+    argument_that_results_in_zero = lambda { |registers, _memory|
+      registers.e = 0b00000001
+    }
+    operation_will_set_flags(
+      { type: :DEC, arguments: [:E] },
+      to: { z: 1, n: 1, h: 0 },
+      given: argument_that_results_in_zero
+    )
+
+    argument_that_results_in_half_carry = lambda { |registers, _memory|
+      registers.e = 0b00010000
+    }
+    operation_will_set_flags(
+      { type: :DEC, arguments: [:E] },
+      to: { h: 1 },
+      given: argument_that_results_in_half_carry
+    )
+
+    operation_will_ignore_flags(
+      { type: :DEC, arguments: [:E] },
+      [:c]
+    )
+  end
+end
+
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
