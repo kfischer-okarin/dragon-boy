@@ -366,6 +366,14 @@ def test_cpu_execute_operation_call(_args, assert)
   assert.equal! memory[0xFFFD], 0x01
 end
 
+def test_cpu_execute_operation_call_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :CALL, arguments: [0x0095] }
+    )
+  end
+end
+
 def test_cpu_execute_operation_push_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
