@@ -276,6 +276,18 @@ def test_cpu_execute_operation_push_register(_args, assert)
   assert.equal! memory[0xFFFD], 0x12
 end
 
+def test_cpu_execute_operation_push_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(
+      { type: :PUSH, arguments: [:BC] },
+      given: lambda { |registers, _memory|
+        registers.bc = 0x1234
+        registers.sp = 0xFFFE
+      }
+    )
+  end
+end
+
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
   registers = Registers.new
   memory = Memory.new
