@@ -200,7 +200,7 @@ def test_cpu_execute_operation_inc_8bit_register(_args, assert)
   assert.equal! registers.c, 0x00
 end
 
-def test_cpu_execute_operation_inc_flags(_args, assert)
+def test_cpu_execute_operation_inc_8bit_register_flags(_args, assert)
   CPUTests.test_flags(assert) do
     argument_that_results_not_in_zero = lambda { |registers, _memory|
       registers.e = 0b00100010
@@ -233,6 +233,30 @@ def test_cpu_execute_operation_inc_flags(_args, assert)
       { type: :INC, arguments: [:E] },
       [:c]
     )
+  end
+end
+
+def test_cpu_execute_operation_inc_16bit_register(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :INC, arguments: [:BC])
+  registers.bc = 0x1234
+
+  cpu.execute operation
+
+  assert.equal! registers.bc, 0x1235
+
+  registers.bc = 0xFFFF
+
+  cpu.execute operation
+
+  assert.equal! registers.bc, 0x0000
+end
+
+def test_cpu_execute_operation_inc_16bit_register_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    operation_will_not_change_any_flags(type: :INC, arguments: [:DE])
   end
 end
 

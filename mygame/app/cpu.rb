@@ -72,12 +72,17 @@ class CPU
 
   def execute_INC(operation)
     register = operation[:arguments][0].downcase
-    result = @registers.send(register) + 1 & 0xFF
-    @registers.send "#{register}=", result
+    case register
+    when :a, :b, :c, :d, :e, :h, :l
+      result = @registers.send(register) + 1 & 0xFF
+      @registers.flag_z = result.zero? ? 1 : 0
+      @registers.flag_n = 0
+      @registers.flag_h = (result & 0xF).zero? ? 1 : 0
+    when :bc, :de, :hl, :sp
+      result = @registers.send(register) + 1 & 0xFFFF
+    end
 
-    @registers.flag_z = result.zero? ? 1 : 0
-    @registers.flag_n = 0
-    @registers.flag_h = (result & 0xF).zero? ? 1 : 0
+    @registers.send "#{register}=", result
     operation[:cycles]
   end
 
