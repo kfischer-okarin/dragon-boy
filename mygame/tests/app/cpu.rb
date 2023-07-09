@@ -594,6 +594,55 @@ def test_cpu_execute_operation_bit_on_register(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_cp_with_constant(_args, assert)
+  CPUTests.test_flags(assert) do
+    a_equal_to_argument = lambda { |registers, _memory|
+      registers.a = 0x34 # 0b00110100
+    }
+    operation_will_set_flags(
+      { type: :CP, arguments: [:A, 0x34] },
+      to: { z: 1, n: 1, c: 0 },
+      given: a_equal_to_argument
+    )
+
+    a_bigger_than_argument = lambda { |registers, _memory|
+      registers.a = 0x34 # 0b00110100
+    }
+    operation_will_set_flags(
+      { type: :CP, arguments: [:A, 0x33] },
+      to: { z: 0, n: 1, c: 0 },
+      given: a_bigger_than_argument
+    )
+
+    a_smaller_than_argument = lambda { |registers, _memory|
+      registers.a = 0x34 # 0b00110100
+    }
+    operation_will_set_flags(
+      { type: :CP, arguments: [:A, 0x35] },
+      to: { z: 0, n: 1, c: 1 },
+      given: a_smaller_than_argument
+    )
+
+    arguments_that_cause_half_carry = lambda { |registers, _memory|
+      registers.a = 0x10 # 0b00010000
+    }
+    operation_will_set_flags(
+      { type: :CP, arguments: [:A, 0x01] },
+      to: { h: 1 },
+      given: arguments_that_cause_half_carry
+    )
+
+    arguments_that_do_not_cause_half_carry = lambda { |registers, _memory|
+      registers.a = 0x10 # 0b00010000
+    }
+    operation_will_ignore_flags(
+      { type: :CP, arguments: [:A, 0x10] },
+      to: { h: 0 },
+      given: arguments_that_do_not_cause_half_carry
+    )
+  end
+end
+
 def test_cpu_execute_next_operation(_args, assert)
   registers = Registers.new
   memory = Memory.new

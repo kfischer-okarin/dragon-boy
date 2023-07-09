@@ -158,6 +158,17 @@ class CPU
     operation[:cycles]
   end
 
+  def execute_CP(operation)
+    argument = operation[:arguments][1]
+    value = argument
+    difference = (@registers.a - value) & 0xFF
+    assign_flag_z difference
+    @registers.flag_n = 1
+    assign_flag_c @registers.a, difference
+    assign_flag_h @registers.a, difference
+    operation[:cycles]
+  end
+
   def condition_fulfilled?(condition)
     case condition
     when :NZ
