@@ -27,15 +27,7 @@ class CPU
 
   def execute_LD(operation)
     target = operation[:arguments][0]
-    source = operation[:arguments][1]
-    value = case source
-            when Operation::Pointer
-              @memory[@registers.send(source.address.downcase)]
-            when Symbol
-              @registers.send(source.downcase)
-            else
-              source
-            end
+    value = source_value operation[:arguments][1]
 
     case target
     when Operation::Pointer
@@ -195,5 +187,16 @@ class CPU
     result = @memory[@registers.sp]
     @registers.sp += 1
     result
+  end
+
+  def source_value(source)
+    case source
+    when Operation::Pointer
+      @memory[@registers.send(source.address.downcase)]
+    when Symbol
+      @registers.send(source.downcase)
+    else
+      source
+    end
   end
 end
