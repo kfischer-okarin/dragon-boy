@@ -67,7 +67,7 @@ class CPU
     case register
     when :a, :b, :c, :d, :e, :h, :l
       result = @registers.send(register) + 1 & 0xFF
-      @registers.flag_z = result.zero? ? 1 : 0
+      assign_flag_z result
       @registers.flag_n = 0
       @registers.flag_h = (result & 0xF).zero? ? 1 : 0
     when :bc, :de, :hl, :sp
@@ -84,7 +84,7 @@ class CPU
     result = old_value - 1 & 0xFF
     @registers.send "#{register}=", result
 
-    @registers.flag_z = result.zero? ? 1 : 0
+    assign_flag_z result
     @registers.flag_n = 1
     @registers.flag_h = (old_value & 0xF).zero? ? 1 : 0
     operation[:cycles]
@@ -123,7 +123,7 @@ class CPU
 
   def execute_XOR(operation)
     @registers.a ^= @registers.send(operation[:arguments][1].downcase)
-    @registers.flag_z = @registers.a.zero? ? 1 : 0
+    assign_flag_z @registers.a
     @registers.flag_n = 0
     @registers.flag_c = 0
     @registers.flag_h = 0
@@ -141,7 +141,7 @@ class CPU
     result = ((value << 1) | @registers.flag_c) & 0xFF
     @registers.send("#{register}=", result)
     @registers.flag_c = (value & 0b10000000) >> 7
-    @registers.flag_z = result.zero? ? 1 : 0
+    assign_flag_z result
     @registers.flag_n = 0
     @registers.flag_h = 0
     operation[:cycles]
@@ -150,7 +150,8 @@ class CPU
   def execute_BIT(operation)
     bit = operation[:arguments][0]
     register = operation[:arguments][1].downcase
-    @registers.flag_z = (@registers.send(register) & (1 << bit)).zero? ? 1 : 0
+    result = @registers.send(register) & (1 << bit)
+    assign_flag_z result
     @registers.flag_n = 0
     @registers.flag_h = 1
     operation[:cycles]
@@ -198,5 +199,9 @@ class CPU
     else
       source
     end
+  end
+
+  def assign_flag_z(result)
+    @registers.flag_z = result.zero? ? 1 : 0
   end
 end
