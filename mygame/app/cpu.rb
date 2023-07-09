@@ -66,10 +66,11 @@ class CPU
     register = operation[:arguments][0].downcase
     case register
     when :a, :b, :c, :d, :e, :h, :l
-      result = @registers.send(register) + 1 & 0xFF
-      assign_flag_z result
+      old_value = @registers.send(register)
+      result = (old_value + 1) & 0xFF
       @registers.flag_n = 0
-      @registers.flag_h = (result & 0xF).zero? ? 1 : 0
+      assign_flag_z result
+      assign_flag_h old_value, result
     when :bc, :de, :hl, :sp
       result = @registers.send(register) + 1 & 0xFFFF
     end
@@ -84,9 +85,9 @@ class CPU
     result = old_value - 1 & 0xFF
     @registers.send "#{register}=", result
 
-    assign_flag_z result
     @registers.flag_n = 1
-    @registers.flag_h = (old_value & 0xF).zero? ? 1 : 0
+    assign_flag_z result
+    assign_flag_h old_value, result
     operation[:cycles]
   end
 
@@ -210,6 +211,14 @@ class CPU
                           new_value < old_value ? 1 : 0
                         else
                           new_value > old_value ? 1 : 0
+                        end
+  end
+
+  def assign_flag_h(old_value, new_value)
+    @registers.flag_h = if @registers.flag_n.zero?
+                          (new_value & 0xF) < (old_value & 0xF) ? 1 : 0
+                        else
+                          (new_value & 0xF) > (old_value & 0xF) ? 1 : 0
                         end
   end
 end
