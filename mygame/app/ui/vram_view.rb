@@ -19,16 +19,7 @@ module UI
 
       y = top - vertical_padding
       left_column_x = @x + 10
-      center_x = @x + (@w / 2)
-      gtk_outputs.primitives << { x: left_column_x, y: y, text: 'BG Palette:' }.label!
-
-      if @io.palettes[:bg]
-        @io.palettes[:bg].each_with_index do |color, index|
-          gtk_outputs.primitives << {
-            x: left_column_x + 100 + index * 20, y: y - 20, w: 20, h: 20, path: :pixel
-          }.sprite!(PALETTE[color])
-        end
-      end
+      render_bg_palette(gtk_outputs, left_column_x, y)
     end
 
     def vertical_padding
@@ -42,5 +33,19 @@ module UI
       dark_gray: { r: 0x46, g: 0x87, b: 0x8f },
       black: { r: 0x33, g: 0x2c, b: 0x50 }
     }
+
+    private
+
+    def render_bg_palette(gtk_outputs, x, y)
+      gtk_outputs.primitives << { x: x, y: y, text: 'BG Palette:' }.label!
+
+      return unless @io.palettes[:bg]
+
+      @io.palettes[:bg].each_with_index do |color, index|
+        gtk_outputs.primitives << {
+          x: x + 100 + index * 20, y: y - 20, w: 20, h: 20, path: :pixel
+        }.sprite!(PALETTE[color])
+      end
+    end
   end
 end
