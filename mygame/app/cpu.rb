@@ -140,9 +140,9 @@ class CPU
     value = @registers.send(register)
     result = ((value << 1) | @registers.flag_c) & 0xFF
     @registers.send("#{register}=", result)
-    @registers.flag_c = (value & 0b10000000) >> 7
     assign_flag_z result
     @registers.flag_n = 0
+    assign_flag_c value, result
     @registers.flag_h = 0
     operation[:cycles]
   end
@@ -203,5 +203,13 @@ class CPU
 
   def assign_flag_z(result)
     @registers.flag_z = result.zero? ? 1 : 0
+  end
+
+  def assign_flag_c(old_value, new_value)
+    @registers.flag_c = if @registers.flag_n.zero?
+                          new_value < old_value ? 1 : 0
+                        else
+                          new_value > old_value ? 1 : 0
+                        end
   end
 end
