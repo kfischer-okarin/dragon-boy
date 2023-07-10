@@ -3,7 +3,7 @@ require 'tests/test_helper.rb'
 def test_io_remember_set_values(_args, assert)
   io = GameBoyIO.new
 
-  (0xFF00..0xFF7F).each do |address|
+  0xFF00.upto(0xFF7F).each do |address|
     io[address] = 0xAA
 
     assert.equal! io[address], 0xAA, "Expected #{address} to be 0xAA"

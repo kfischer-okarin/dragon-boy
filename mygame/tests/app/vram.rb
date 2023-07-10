@@ -3,7 +3,7 @@ require 'tests/test_helper.rb'
 def test_vram_remembers_set_values(_args, assert)
   vram = VRAM.new
 
-  (0x8000..0x9FFF).each do |address|
+  0x8000.upto(0x9FFF).each do |address|
     vram[address] = 0xAA
 
     assert.equal! vram[address], 0xAA, "Expected #{address} to be 0xAA"
