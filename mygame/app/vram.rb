@@ -4,6 +4,14 @@ class VRAM
   def initialize
     @values = {}
     @palettes = {}
+    @tiles = []
+    @dirty_tiles = {}
+  end
+
+  def clear
+    0x8000.upto(0x9FFF) do |address|
+      @values[address] = 0
+    end
   end
 
   def [](address)
@@ -20,11 +28,37 @@ class VRAM
         palette_color((value & 0b11000000) >> 6)
       ]
     when 0x8000..0x9FFF
-      # Not yet implemented
+      tile_index = (address - 0x8000).idiv 16
+      @dirty_tiles[tile_index] = true
     else
       raise 'Illegal VRAM address: %04X' % address
     end
     @values[address] = value
+  end
+
+  def tile(tile_index)
+    @tiles[tile_index]
+  end
+
+  def update_dirty_tiles
+    updated_tiles = @dirty_tiles.keys
+    @dirty_tiles.clear
+    updated_tiles.each do |tile_index|
+      tile = @tiles[tile_index] ||= Array.new(8) { Array.new(8) { 0 } }
+
+      tile_address = 0x8000 + (tile_index * 16)
+      8.times do |y_from_top|
+        low_byte = @values[tile_address + (y_from_top * 2)]
+        high_byte = @values[tile_address + (y_from_top * 2) + 1]
+        8.times do |x|
+          bit_index = 7 - x
+          low_bit = (low_byte >> bit_index) & 0b1
+          high_bit = (high_byte >> bit_index) & 0b1
+          tile[7 - y_from_top][x] = (high_bit << 1) | low_bit
+        end
+      end
+    end
+    updated_tiles
   end
 
   private

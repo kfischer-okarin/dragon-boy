@@ -25,3 +25,24 @@ def test_vram_palettes_bg(_args, assert)
 
   assert.equal! vram.palettes[:bg], [:dark_gray, :white, :light_gray, :black]
 end
+
+def test_vram_writing_to_tile_memory_updates_tile_pixels(_args, assert)
+  vram = VRAM.new
+  vram.clear
+
+  vram[0x8032] = 0b00111100
+  vram[0x8033] = 0b01111110
+  updated_tiles = vram.update_dirty_tiles
+
+  assert.equal! updated_tiles, [3]
+  assert.equal! vram.tile(3), [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0b00, 0b10, 0b11, 0b11, 0b11, 0b11, 0b10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+  ]
+end
