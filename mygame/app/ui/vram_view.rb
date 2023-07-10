@@ -1,11 +1,11 @@
 module UI
   class VRAMView
-    attr_accessor :io, :x, :y, :w, :h
+    attr_accessor :vram, :x, :y, :w, :h
 
     attr_rect
 
-    def initialize(io, x:, y:, w:, h:)
-      @io = io
+    def initialize(vram, x:, y:, w:, h:)
+      @vram = vram
       @x = x
       @y = y
       @w = w
@@ -39,9 +39,9 @@ module UI
     def render_bg_palette(gtk_outputs, x, y)
       gtk_outputs.primitives << { x: x, y: y, text: 'BG Palette:' }.label!
 
-      return unless @io.palettes[:bg]
+      return unless @vram.palettes[:bg]
 
-      @io.palettes[:bg].each_with_index do |color, index|
+      @vram.palettes[:bg].each_with_index do |color, index|
         gtk_outputs.primitives << {
           x: x + 100 + index * 20, y: y - 20, w: 20, h: 20, path: :pixel
         }.sprite!(PALETTE[color])

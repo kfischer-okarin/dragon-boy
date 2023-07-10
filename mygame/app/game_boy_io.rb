@@ -53,13 +53,6 @@ class GameBoyIO
       @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
       @sound[:enabled] = value & 0b10000000 != 0
-    when 0xFF47
-      @palettes[:bg] = [
-        palette_color(value & 0b00000011),
-        palette_color((value & 0b00001100) >> 2),
-        palette_color((value & 0b00110000) >> 4),
-        palette_color((value & 0b11000000) >> 6)
-      ]
     end
     @values[address] = value
   end
@@ -94,19 +87,6 @@ class GameBoyIO
       :off
     else
       :center
-    end
-  end
-
-  def palette_color(value)
-    case value
-    when 0b00
-      :white
-    when 0b01
-      :light_gray
-    when 0b10
-      :dark_gray
-    when 0b11
-      :black
     end
   end
 end

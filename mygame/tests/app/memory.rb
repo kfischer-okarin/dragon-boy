@@ -81,3 +81,13 @@ def test_memory_access_vram_memory_without_connected_vram(_args, assert)
 
   assert.equal! memory[0x8005], 0xBB
 end
+
+def test_memory_forward_palette_setting_to_vram(_args, assert)
+  memory = Memory.new
+  vram = {}
+  memory.connect_vram vram
+
+  memory[0xFF47] = 0xBB
+
+  assert.equal! vram[0xFF47], 0xBB
+end
