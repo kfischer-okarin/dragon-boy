@@ -8,10 +8,12 @@ class GameBoy
     @memory = Memory.new
     @cpu = CPU.new registers: @registers, memory: @memory
     @io = GameBoyIO.new
+    @vram = VRAM.new
 
     @memory.load_rom $gtk.read_file("roms/#{@rom}")
     @memory.load_boot_rom $gtk.read_file(@boot_rom) if @boot_rom
     @memory.connect_io @io
+    @memory.connect_vram @vram
 
     setup_memory unless boot_rom
   end

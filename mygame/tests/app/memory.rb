@@ -60,3 +60,24 @@ def test_memory_access_io_memory_without_connected_io(_args, assert)
 
   assert.equal! memory[0xFF00], 0xBB
 end
+
+def test_memory_connect_vram(_args, assert)
+  memory = Memory.new
+  vram = { 0x8010 => 0xAA } # Anything with #[] and #[]= will do
+
+  memory.connect_vram vram
+
+  assert.equal! memory[0x8010], 0xAA
+
+  memory[0x8012] = 0xBB
+
+  assert.equal! vram[0x8012], 0xBB
+end
+
+def test_memory_access_vram_memory_without_connected_vram(_args, assert)
+  memory = Memory.new
+
+  memory[0x8005] = 0xBB
+
+  assert.equal! memory[0x8005], 0xBB
+end

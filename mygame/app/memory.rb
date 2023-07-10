@@ -4,6 +4,7 @@ class Memory
     @boot_rom = nil
     @content = Array.new(length)
     @io = nil
+    @vram = nil
   end
 
   def load_rom(rom)
@@ -18,6 +19,10 @@ class Memory
 
   def connect_io(io)
     @io = io
+  end
+
+  def connect_vram(vram)
+    @vram = vram
   end
 
   def [](address)
@@ -40,6 +45,8 @@ class Memory
 
   def memory_target(address)
     case address
+    when 0x8000..0x9FFF
+      @vram || @content
     when 0xFF00..0xFF7F
       @io || @content
     else
