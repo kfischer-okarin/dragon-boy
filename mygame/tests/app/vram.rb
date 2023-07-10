@@ -35,7 +35,7 @@ def test_vram_writing_to_tile_memory_updates_tile_pixels(_args, assert)
   updated_tiles = vram.update_dirty_tiles
 
   assert.equal! updated_tiles, [3]
-  assert.equal! vram.tile(3), [
+  assert.equal! vram.tile(3).pixels, [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],

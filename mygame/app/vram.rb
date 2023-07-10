@@ -12,6 +12,7 @@ class VRAM
     0x8000.upto(0x9FFF) do |address|
       @values[address] = 0
     end
+    @tiles = 384.times.map { Tile.new }
   end
 
   def [](address)
@@ -37,14 +38,14 @@ class VRAM
   end
 
   def tile(tile_index)
-    @tiles[tile_index]
+    @tiles[tile_index] ||= Tile.new
   end
 
   def update_dirty_tiles
     updated_tiles = @dirty_tiles.keys
     @dirty_tiles.clear
     updated_tiles.each do |tile_index|
-      tile = @tiles[tile_index] ||= Array.new(8) { Array.new(8) { 0 } }
+      pixels = Array.new(8) { Array.new(8) { 0 } }
 
       tile_address = 0x8000 + (tile_index * 16)
       8.times do |y_from_top|
@@ -54,11 +55,16 @@ class VRAM
           bit_index = 7 - x
           low_bit = (low_byte >> bit_index) & 0b1
           high_bit = (high_byte >> bit_index) & 0b1
-          tile[7 - y_from_top][x] = (high_bit << 1) | low_bit
+          pixels[7 - y_from_top][x] = (high_bit << 1) | low_bit
         end
       end
+      tile(tile_index).pixels = pixels
     end
     updated_tiles
+  end
+
+  class Tile
+    attr_accessor :pixels
   end
 
   private
