@@ -44,8 +44,9 @@ class VRAM
   def update_dirty_tiles
     updated_tiles = @dirty_tiles.keys
     @dirty_tiles.clear
+
     updated_tiles.each do |tile_index|
-      pixels = Array.new(8) { Array.new(8) { 0 } }
+      pixels = Array.new(64) { 0 }
 
       tile_address = 0x8000 + (tile_index * 16)
       8.times do |y_from_top|
@@ -55,16 +56,22 @@ class VRAM
           bit_index = 7 - x
           low_bit = (low_byte >> bit_index) & 0b1
           high_bit = (high_byte >> bit_index) & 0b1
-          pixels[7 - y_from_top][x] = (high_bit << 1) | low_bit
+          pixels[(y_from_top * 8 + x)] = (high_bit << 1) | low_bit
         end
       end
+
       tile(tile_index).pixels = pixels
     end
+
     updated_tiles
   end
 
   class Tile
     attr_accessor :pixels
+
+    def initialize
+      @pixels = Array.new(64) { 0 }
+    end
   end
 
   private
