@@ -53,6 +53,10 @@ class GameBoyIO
       @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
       @sound[:enabled] = value & 0b10000000 != 0
+    when 0xFF00..0xFF7F
+      # Not yet implemented
+    else
+      raise 'Illegal IO address: %04X' % address
     end
     @values[address] = value
   end

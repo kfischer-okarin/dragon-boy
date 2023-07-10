@@ -1,3 +1,5 @@
+require 'tests/test_helper.rb'
+
 def test_vram_remembers_set_values(_args, assert)
   vram = VRAM.new
 
@@ -5,6 +7,14 @@ def test_vram_remembers_set_values(_args, assert)
     vram[address] = 0xAA
 
     assert.equal! vram[address], 0xAA, "Expected #{address} to be 0xAA"
+  end
+end
+
+def test_vram_cannot_write_to_unrelated_addresses(_args, assert)
+  vram = VRAM.new
+
+  assert.exception_raised! do
+    vram[0x7FFF] = 0xAA
   end
 end
 

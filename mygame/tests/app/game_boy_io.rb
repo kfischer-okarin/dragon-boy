@@ -10,6 +10,14 @@ def test_io_remember_set_values(_args, assert)
   end
 end
 
+def test_io_cannot_write_to_unrelated_addresses(_args, assert)
+  io = GameBoyIO.new
+
+  assert.exception_raised! do
+    io[0x8000] = 0xAA
+  end
+end
+
 def test_io_turn_on_sound(_args, assert)
   io = GameBoyIO.new
 

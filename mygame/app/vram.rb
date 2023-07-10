@@ -19,6 +19,10 @@ class VRAM
         palette_color((value & 0b00110000) >> 4),
         palette_color((value & 0b11000000) >> 6)
       ]
+    when 0x8000..0x9FFF
+      # Not yet implemented
+    else
+      raise 'Illegal VRAM address: %04X' % address
     end
     @values[address] = value
   end
