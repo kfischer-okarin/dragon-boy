@@ -52,6 +52,8 @@ class VRAM
       8.times do |y_from_top|
         low_byte = @values[tile_address + (y_from_top * 2)]
         high_byte = @values[tile_address + (y_from_top * 2) + 1]
+        next unless low_byte && high_byte
+
         8.times do |x|
           bit_index = 7 - x
           low_bit = (low_byte >> bit_index) & 0b1

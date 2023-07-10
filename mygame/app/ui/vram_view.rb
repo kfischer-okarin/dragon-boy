@@ -10,6 +10,12 @@ module UI
       @y = y
       @w = w
       @h = h
+      @render_targets_initialized = false
+      @updated_tiles = []
+    end
+
+    def update(_args)
+      @updated_tiles = @vram.update_dirty_tiles
     end
 
     def render(gtk_outputs)
@@ -20,6 +26,8 @@ module UI
       y = top - vertical_padding
       left_column_x = @x + 10
       render_bg_palette(gtk_outputs, left_column_x, y)
+      y -= 40
+      render_tiles(gtk_outputs, left_column_x, y)
     end
 
     def vertical_padding
@@ -45,6 +53,34 @@ module UI
         gtk_outputs.primitives << {
           x: x + 100 + index * 20, y: y - 20, w: 20, h: 20, path: :pixel
         }.sprite!(PALETTE[color])
+      end
+    end
+
+    def render_tiles(gtk_outputs, x, y)
+      update_dirty_render_targets(gtk_outputs) if @updated_tiles.any?
+
+      size = 16
+      tiles_per_row = 32
+      384.times do |index|
+        gtk_outputs.primitives << {
+          x: x + ((index % tiles_per_row) * size),
+          y: y - size - (index.idiv(tiles_per_row) * size),
+          w: size,
+          h: size,
+          path: "tile_#{index}"
+        }.sprite!
+      end
+    end
+
+    def update_dirty_render_targets(gtk_outputs)
+      return unless @vram.palettes[:bg]
+
+      palette = @vram.palettes[:bg].map { |color| PALETTE[color] }
+      @updated_tiles.each do |tile_index|
+        render_target = gtk_outputs["tile_#{tile_index}"]
+        render_target.w = 8
+        render_target.h = 8
+        render_target.primitives << @vram.tile(tile_index).pixel_primitives(palette)
       end
     end
   end

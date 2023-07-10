@@ -28,6 +28,7 @@ module Screens
 
       @program_view.update(args)
       @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+      send "update_#{@state.displayed_view}_view", args if respond_to? "update_#{@state.displayed_view}_view"
 
       @program_view.render(args.outputs)
       @registers_view.render(args.outputs)
@@ -99,6 +100,10 @@ module Screens
 
     def render_sound_view(args)
       @sound_view.render(args.outputs)
+    end
+
+    def update_vram_view(args)
+      @vram_view.update(args)
     end
 
     def render_vram_view(args)
