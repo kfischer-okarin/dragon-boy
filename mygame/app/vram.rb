@@ -72,6 +72,21 @@ class VRAM
     def initialize
       @pixels = Array.new(64) { 0 }
     end
+
+    def pixel_primitives(palette)
+      result = []
+      @pixels.each_with_index do |pixel, index|
+        color = palette[pixel]
+        next unless color
+
+        result << {
+          x: index % 8, y: 7 - index.idiv(8), w: 1, h: 1,
+          path: :pixel
+        }.sprite!(color)
+      end
+
+      result
+    end
   end
 
   private

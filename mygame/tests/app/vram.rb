@@ -46,3 +46,32 @@ def test_vram_writing_to_tile_memory_updates_tile_pixels(_args, assert)
        0,    0,    0,    0,    0,    0,    0,    0
   ]
 end
+
+def test_vram_tile_pixel_primitives(_args, assert)
+  vram = VRAM.new
+  tile = vram.tile(22)
+  tile.pixels = [
+    0, 0, 0, 3, 0, 0, 0, 0,
+    0, 0, 3, 2, 3, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+  ]
+
+  colors = [
+    nil,
+    { r: 0, g: 0, b: 0 },
+    { r: 255, g: 0, b: 0 },
+    { r: 0, g: 255, b: 0 }
+  ]
+  assert.equal! tile.pixel_primitives(colors), [
+    { x: 3, y: 7, w: 1, h: 1, path: :pixel, r: 0, g: 255, b: 0 }.sprite!,
+    { x: 2, y: 6, w: 1, h: 1, path: :pixel, r: 0, g: 255, b: 0 }.sprite!,
+    { x: 3, y: 6, w: 1, h: 1, path: :pixel, r: 255, g: 0, b: 0 }.sprite!,
+    { x: 4, y: 6, w: 1, h: 1, path: :pixel, r: 0, g: 255, b: 0 }.sprite!,
+    { x: 3, y: 5, w: 1, h: 1, path: :pixel, r: 0, g: 0, b: 0 }.sprite!
+  ]
+end
