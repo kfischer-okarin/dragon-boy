@@ -34,14 +34,6 @@ module UI
       15
     end
 
-    # https://lospec.com/palette-list/kirokaze-gameboy
-    PALETTE = {
-      white: { r: 0xe2, g: 0xf3, b: 0xe4 },
-      light_gray: { r: 0x94, g: 0xe3, b: 0x44 },
-      dark_gray: { r: 0x46, g: 0x87, b: 0x8f },
-      black: { r: 0x33, g: 0x2c, b: 0x50 }
-    }
-
     private
 
     def render_bg_palette(gtk_outputs, x, y)
@@ -49,14 +41,15 @@ module UI
 
       return unless @vram.palettes[:bg]
 
-      @vram.palettes[:bg].each_with_index do |color, index|
+      bg_palette_colors.each_with_index do |color, index|
         gtk_outputs.primitives << {
           x: x + 100 + index * 20, y: y - 20, w: 20, h: 20, path: :pixel
-        }.sprite!(PALETTE[color])
+        }.sprite!(color)
       end
     end
 
     def render_tiles(gtk_outputs, x, y)
+      initialize_render_targets(gtk_outputs) unless @render_targets_initialized
       update_dirty_render_targets(gtk_outputs) if @updated_tiles.any?
 
       size = 16
@@ -72,16 +65,41 @@ module UI
       end
     end
 
-    def update_dirty_render_targets(gtk_outputs)
-      return unless @vram.palettes[:bg]
+    def initialize_render_targets(gtk_outputs)
+      384.times do |tile_index|
+        tile_render_target(gtk_outputs, tile_index)
+      end
+      @render_targets_initialized = true
+    end
 
-      palette = @vram.palettes[:bg].map { |color| PALETTE[color] }
+    def update_dirty_render_targets(gtk_outputs)
+      palette_colors = bg_palette_colors
       @updated_tiles.each do |tile_index|
-        render_target = gtk_outputs["tile_#{tile_index}"]
-        render_target.w = 8
-        render_target.h = 8
-        render_target.primitives << @vram.tile(tile_index).pixel_primitives(palette)
+        tile_render_target(gtk_outputs, tile_index).primitives <<
+          @vram.tile(tile_index).pixel_primitives(palette_colors)
       end
     end
+
+    def tile_render_target(gtk_outputs, tile_index)
+      render_target = gtk_outputs["tile_#{tile_index}"]
+      render_target.w = 8
+      render_target.h = 8
+      render_target
+    end
+
+    def bg_palette_colors
+      palette = @vram.palettes[:bg] || FALLBACK_PALETTE
+      palette.map { |color| PALETTE_COLORS[color] }
+    end
+
+    FALLBACK_PALETTE = [:white, :white, :white, :white].freeze
+
+    # https://lospec.com/palette-list/kirokaze-gameboy
+    PALETTE_COLORS = {
+      white: { r: 0xe2, g: 0xf3, b: 0xe4 }.freeze,
+      light_gray: { r: 0x94, g: 0xe3, b: 0x44 }.freeze,
+      dark_gray: { r: 0x46, g: 0x87, b: 0x8f }.freeze,
+      black: { r: 0x33, g: 0x2c, b: 0x50 }.freeze
+    }.freeze
   end
 end
