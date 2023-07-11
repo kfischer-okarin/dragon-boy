@@ -27,6 +27,8 @@ module Screens
 
       process_inputs(args)
 
+      update_game_boy
+
       update_program_view(args)
       send "update_#{@state.displayed_view}_view", args if respond_to? "update_#{@state.displayed_view}_view"
 
@@ -49,22 +51,18 @@ module Screens
 
     def process_inputs(args)
       key_down = args.inputs.keyboard.key_down
-      game_boy = @state.game_boy
 
-      pc_before = @state.game_boy.registers.pc
-      @state.running = !@state.running if key_down.enter
-      game_boy.cpu.execute_next_operation if key_down.space
+      @state.operations_to_execute = 0
       if @state.running
-        1000.times do
-          game_boy.cpu.execute_next_operation
-          if @program_view.breakpoints.key? game_boy.registers.pc
-            @state.running = false
-            break
-          end
+        if key_down.enter
+          @state.running = false
+        else
+          @state.operations_to_execute = 1000
         end
+      else
+        @state.operations_to_execute = 1 if key_down.space
+        @state.running = true if key_down.enter
       end
-
-      scroll_to_pc_if_needed if @state.game_boy.registers.pc != pc_before
 
       if key_down.one
         @state.displayed_view = :memory
@@ -79,8 +77,22 @@ module Screens
       $screen = Screens::RomSelection.new(args) if key_down.escape
     end
 
+    def update_game_boy
+      game_boy = @state.game_boy
+      @state.pc_at_start_of_tick = game_boy.registers.pc
+      @state.operations_to_execute.times do
+        game_boy.cpu.execute_next_operation
+        if @program_view.breakpoints.key? game_boy.registers.pc
+          @state.running = false
+          break
+        end
+      end
+    end
+
     def update_program_view(args)
       game_boy = @state.game_boy
+
+      scroll_to_pc_if_needed if @state.game_boy.registers.pc != @state.pc_at_start_of_tick
 
       @program_view.update(args)
       @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
