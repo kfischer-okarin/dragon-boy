@@ -21,6 +21,7 @@ module UI
       @breakpoints = {}
       @comments = {}
       @lines = {}
+      @parsed_up_to = -1
     end
 
     def update(args)
@@ -58,15 +59,14 @@ module UI
 
       y = top - vertical_padding
       address = @offset
-      previous_address = nil
       while y > @y + vertical_padding
-        line = @lines[address] ||= parse_line(address, previous_address)
+        parse_next_line until @parsed_up_to >= address
+        line = @lines[address]
 
         @rendered_lines << line.merge(
           rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
           comment: @comments[address]
         )
-        previous_address = address
         address = line[:next_address]
         break if address >= @bytes.length
 
@@ -74,7 +74,15 @@ module UI
       end
     end
 
-    def parse_line(address, previous_address)
+    def parse_next_line
+      if @lines.empty?
+        address = 0
+        previous_address = nil
+      else
+        address = @lines[@parsed_up_to][:next_address]
+        previous_address = @parsed_up_to
+      end
+
       operation = Operation.parse(@bytes, address)
       argument_strings = operation[:arguments].map { |argument|
         case argument
@@ -102,8 +110,9 @@ module UI
         operation: operation,
         target_address: calc_target_address(address, operation)
       }
+      @parsed_up_to = address
       result.compact!
-      result
+      @lines[address] = result
     end
 
     def calc_target_address(address, operation)
