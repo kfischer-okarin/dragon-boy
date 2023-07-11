@@ -170,7 +170,7 @@ module UI
         end
         if @breakpoints.key? address
           operation_primitives << {
-            x: x + 60, y: y, text: 'B', r: 255, g: 0, b: 0
+            x: x + 55, y: y, text: 'B', r: 255, g: 0, b: 0
           }.label!
         end
         operation_primitives
