@@ -20,6 +20,7 @@ module UI
       @rendered_operations = []
       @breakpoints = {}
       @comments = {}
+      @lines = {}
     end
 
     def update(args)
@@ -57,41 +58,52 @@ module UI
 
       y = top - vertical_padding
       address = @offset
+      previous_address = nil
       while y > @y + vertical_padding
-        operation = Operation.parse(@bytes, address)
-        argument_strings = operation[:arguments].map { |argument|
-          case argument
-          when Operation::Pointer
-            pointer_address = argument.address
-            pointer_address = format_hex_value(pointer_address, byte_count: operation[:length] - 1) if pointer_address.is_a? Integer
-            "[#{pointer_address}]"
-          when Integer
-            case operation[:type]
-            when :JR
-              argument.to_s
-            else
-              format_hex_value(argument, byte_count: operation[:length] - 1)
-            end
-          else
-            argument.to_s
-          end
-        }
+        line = @lines[address] ||= parse_line(address, previous_address)
 
-        rendered_operation = {
+        @rendered_operations << line.merge(
           rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
-          address: address,
-          text: "#{operation[:type]} #{argument_strings.join(', ')}",
-          comment: @comments[address],
-          operation: operation,
-          target_address: calc_target_address(address, operation)
-        }
-        rendered_operation.compact!
-        @rendered_operations << rendered_operation
-        address += operation[:length]
+          comment: @comments[address]
+        )
+        previous_address = address
+        address = line[:next_address]
         break if address >= @bytes.length
 
         y -= 20
       end
+    end
+
+    def parse_line(address, previous_address)
+      operation = Operation.parse(@bytes, address)
+      argument_strings = operation[:arguments].map { |argument|
+        case argument
+        when Operation::Pointer
+          pointer_address = argument.address
+          pointer_address = format_hex_value(pointer_address, byte_count: operation[:length] - 1) if pointer_address.is_a? Integer
+          "[#{pointer_address}]"
+        when Integer
+          case operation[:type]
+          when :JR
+            argument.to_s
+          else
+            format_hex_value(argument, byte_count: operation[:length] - 1)
+          end
+        else
+          argument.to_s
+        end
+      }
+
+      result = {
+        address: address,
+        previous_address: previous_address,
+        next_address: address + operation[:length],
+        text: "#{operation[:type]} #{argument_strings.join(', ')}",
+        operation: operation,
+        target_address: calc_target_address(address, operation)
+      }
+      result.compact!
+      result
     end
 
     def calc_target_address(address, operation)
