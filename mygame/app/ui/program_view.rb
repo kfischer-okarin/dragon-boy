@@ -5,7 +5,7 @@ module UI
 
     attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints, :comments
 
-    attr_reader :hovered_operation
+    attr_reader :hovered_line
 
     attr_rect
 
@@ -17,7 +17,7 @@ module UI
       @h = h
       @offset = 0
       @highlights = []
-      @rendered_operations = []
+      @rendered_lines = []
       @breakpoints = {}
       @comments = {}
       @lines = {}
@@ -25,7 +25,7 @@ module UI
 
     def update(args)
       reset_highlights
-      calc_rendered_operations
+      calc_rendered_lines
       handle_hover(args)
       handle_toggle_breakpoint(args)
     end
@@ -36,7 +36,7 @@ module UI
       ]
 
       render_highlights(gtk_outputs)
-      render_operations(gtk_outputs)
+      render_lines(gtk_outputs)
     end
 
     def address_visible?(address)
@@ -44,7 +44,7 @@ module UI
     end
 
     def maximum_visible_address
-      @rendered_operations.last[:address] + @rendered_operations.last[:operation][:length] - 1
+      @rendered_lines.last[:address] + @rendered_lines.last[:operation][:length] - 1
     end
 
     private
@@ -53,8 +53,8 @@ module UI
       @highlights = []
     end
 
-    def calc_rendered_operations
-      @rendered_operations = []
+    def calc_rendered_lines
+      @rendered_lines = []
 
       y = top - vertical_padding
       address = @offset
@@ -62,7 +62,7 @@ module UI
       while y > @y + vertical_padding
         line = @lines[address] ||= parse_line(address, previous_address)
 
-        @rendered_operations << line.merge(
+        @rendered_lines << line.merge(
           rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
           comment: @comments[address]
         )
@@ -119,27 +119,27 @@ module UI
     end
 
     def handle_hover(args)
-      @hovered_operation = @rendered_operations.find { |rendered_operation|
-        args.inputs.mouse.inside_rect? rendered_operation[:rect]
+      @hovered_line = @rendered_lines.find { |line|
+        args.inputs.mouse.inside_rect? line[:rect]
       }
-      return unless @hovered_operation
+      return unless @hovered_line
 
       @highlights << {
-        address: hovered_operation[:address],
+        address: hovered_line[:address],
         color: HOVER_COLOR
       }
-      return unless hovered_operation[:target_address]
+      return unless hovered_line[:target_address]
 
       @highlights << {
-        address: hovered_operation[:target_address],
+        address: hovered_line[:target_address],
         color: JUMP_TARGET_COLOR
       }
     end
 
     def handle_toggle_breakpoint(args)
-      return unless args.inputs.mouse.click && @hovered_operation
+      return unless args.inputs.mouse.click && @hovered_line
 
-      address = @hovered_operation[:address]
+      address = @hovered_line[:address]
       if @breakpoints.key? address
         @breakpoints.delete address
       else
@@ -151,41 +151,41 @@ module UI
       gtk_outputs.primitives << @highlights.map { |highlight|
         next unless highlight[:address] >= @offset && highlight[:address] <= maximum_visible_address
 
-        rendered_operation = @rendered_operations.find { |rendered|
-          rendered[:address] == highlight[:address]
+        highlight_line = @rendered_lines.find { |line|
+          line[:address] == highlight[:address]
         }
-        next unless rendered_operation
+        next unless highlight_line
 
-        gtk_outputs.primitives << rendered_operation[:rect].merge(path: :pixel).sprite!(highlight[:color])
+        gtk_outputs.primitives << highlight_line[:rect].merge(path: :pixel).sprite!(highlight[:color])
       }
     end
 
-    def render_operations(gtk_outputs)
-      gtk_outputs.primitives << @rendered_operations.map { |rendered_operation|
-        x = rendered_operation[:rect][:x]
-        y = rendered_operation[:rect][:y] + 20
-        address = rendered_operation[:address]
-        operation_primitives = [
+    def render_lines(gtk_outputs)
+      gtk_outputs.primitives << @rendered_lines.map { |line|
+        x = line[:rect][:x]
+        y = line[:rect][:y] + 20
+        address = line[:address]
+        line_primitives = [
           {
             x: x, y: y, text: '%04X' % address,
             r: 100, g: 100, b: 100
           }.label!,
           {
-            x: x + 80, y: y, text: rendered_operation[:text]
+            x: x + 80, y: y, text: line[:text]
           }.label!
         ]
-        if rendered_operation[:comment]
-          operation_primitives << {
-            x: x + 250, y: y, text: rendered_operation[:comment],
+        if line[:comment]
+          line_primitives << {
+            x: x + 250, y: y, text: line[:comment],
             r: 100, g: 100, b: 100
           }.label!
         end
         if @breakpoints.key? address
-          operation_primitives << {
+          line_primitives << {
             x: x + 55, y: y, text: 'B', r: 255, g: 0, b: 0
           }.label!
         end
-        operation_primitives
+        line_primitives
       }
     end
 

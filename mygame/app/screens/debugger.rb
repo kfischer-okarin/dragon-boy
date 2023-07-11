@@ -95,17 +95,17 @@ module Screens
         color: { r: 200, g: 200, b: 200 },
         size: 3
       }
-      hovered_operation = @program_view.hovered_operation
-      if hovered_operation
-        address = hovered_operation[:address]
+      hovered_line = @program_view.hovered_line
+      if hovered_line
+        address = hovered_line[:address]
         @memory_view.highlights << {
-          address: (address..(address + hovered_operation[:operation][:length] - 1)),
+          address: (address..(address + hovered_line[:operation][:length] - 1)),
           color: UI::ProgramView::HOVER_COLOR,
           size: 2
         }
-        if hovered_operation[:target_address]
+        if hovered_line[:target_address]
           @memory_view.highlights << {
-            address: hovered_operation[:target_address],
+            address: hovered_line[:target_address],
             color: UI::ProgramView::JUMP_TARGET_COLOR,
             size: 2
           }
