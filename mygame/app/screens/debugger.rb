@@ -6,10 +6,12 @@ module Screens
         state.running = false
         state.displayed_view = :memory
       end
+      @state = args.state.debugger
+
       registers_view_h = 250
       @program_view = UI::ProgramView.new(game_boy.memory, x: 0, y: 0, w: 640, h: 720)
       @program_view.offset = game_boy.registers.pc
-      @program_view.comments = load_comments(game_boy)
+      reload_comments
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
 
       @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
@@ -48,12 +50,12 @@ module Screens
     end
 
     def process_inputs(args)
-      keyboard = args.inputs.keyboard
+      key_down = args.inputs.keyboard.key_down
       game_boy = @state.game_boy
 
       pc_before = @state.game_boy.registers.pc
-      @state.running = !@state.running if keyboard.key_down.enter
-      game_boy.cpu.execute_next_operation if keyboard.key_down.space
+      @state.running = !@state.running if key_down.enter
+      game_boy.cpu.execute_next_operation if key_down.space
       if @state.running
         1000.times do
           game_boy.cpu.execute_next_operation
@@ -66,15 +68,17 @@ module Screens
 
       scroll_to_pc_if_needed if @state.game_boy.registers.pc != pc_before
 
-      if keyboard.key_down.one
+      if key_down.one
         @state.displayed_view = :memory
-      elsif keyboard.key_down.two
+      elsif key_down.two
         @state.displayed_view = :sound
-      elsif keyboard.key_down.three
+      elsif key_down.three
         @state.displayed_view = :vram
       end
 
-      $screen = Screens::RomSelection.new(args) if keyboard.key_down.escape
+      reload_comments if key_down.c
+
+      $screen = Screens::RomSelection.new(args) if key_down.escape
     end
 
     def render_memory_view(args)
@@ -114,6 +118,10 @@ module Screens
       pc = @state.game_boy.registers.pc
       @program_view.offset = pc unless @program_view.address_visible? pc
       @memory_view.offset = pc & 0xFFF0 unless @memory_view.address_visible? pc
+    end
+
+    def reload_comments
+      @program_view.comments = load_comments(@state.game_boy)
     end
   end
 end
