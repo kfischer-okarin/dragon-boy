@@ -109,6 +109,11 @@ module Screens
     def update_memory_view(args)
       game_boy = @state.game_boy
 
+      unless @memory_view.address_visible?(@program_view.offset) &&
+             @memory_view.address_visible?(@program_view.maximum_visible_address)
+        @memory_view.offset = @program_view.offset & 0xFFF0
+      end
+
       @memory_view.highlights = []
       @memory_view.highlights << {
         address: (@program_view.offset..@program_view.maximum_visible_address),
