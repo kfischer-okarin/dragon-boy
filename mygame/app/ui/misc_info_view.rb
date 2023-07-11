@@ -20,6 +20,8 @@ module UI
       x = @x + 10
       y = top - 10
       gtk_outputs.primitives << { x: x, y: y, text: "Cycles: #{@game_boy.cpu.cycles}" }.label!
+      y -= 20
+      gtk_outputs.primitives << { x: x, y: y, text: "FPS: #{$gtk.current_framerate.to_i}" }.label!
     end
   end
 end
