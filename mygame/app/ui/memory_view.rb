@@ -77,7 +77,7 @@ module UI
     end
 
     def maximum_visible_address
-      visible_lines = (@h - vertical_padding * 2).idiv LINE_SPACING
+      visible_lines = ((@h - vertical_padding * 2) / LINE_SPACING).ceil
       @offset + (visible_lines * 16) - 1
     end
 
