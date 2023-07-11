@@ -28,7 +28,8 @@ module UI
       reset_highlights
       calc_rendered_lines
       handle_hover(args)
-      handle_toggle_breakpoint(args)
+      click_handled = handle_scroll(args)
+      handle_toggle_breakpoint(args) unless click_handled
     end
 
     def render(gtk_outputs)
@@ -38,6 +39,7 @@ module UI
 
       render_highlights(gtk_outputs)
       render_lines(gtk_outputs)
+      render_scroll_buttons(gtk_outputs)
     end
 
     def address_visible?(address)
@@ -145,6 +147,47 @@ module UI
       }
     end
 
+    def handle_scroll(args)
+      mouse = args.inputs.mouse
+      return unless mouse.click
+
+      if can_scroll_up?
+        if mouse.inside_rect? page_up_rect
+          number_of_visible_lines.times do
+            scroll_up_one_line
+            break if @offset.zero?
+          end
+          return true
+        end
+        if mouse.inside_rect? one_line_up_rect
+          scroll_up_one_line
+          return true
+        end
+      end
+
+      if can_scroll_down?
+        if mouse.inside_rect? page_down_rect
+          number_of_visible_lines.times do
+            scroll_down_one_line
+            break if @offset >= @bytes.length
+          end
+          return true
+        end
+        if mouse.inside_rect? one_line_down_rect
+          scroll_down_one_line
+          return true
+        end
+      end
+    end
+
+    def scroll_up_one_line
+      @offset = @lines[@offset][:previous_address]
+    end
+
+    def scroll_down_one_line
+      @offset = @lines[@offset][:next_address]
+    end
+
     def handle_toggle_breakpoint(args)
       return unless args.inputs.mouse.click && @hovered_line
 
@@ -191,11 +234,57 @@ module UI
         end
         if @breakpoints.key? address
           line_primitives << {
-            x: x + 55, y: y, text: 'B', r: 255, g: 0, b: 0
+            x: x + 65 , y: y, text: 'B', r: 255, g: 0, b: 0
           }.label!
         end
         line_primitives
       }
+    end
+
+    def render_scroll_buttons(gtk_outputs)
+      if can_scroll_up?
+        gtk_outputs.primitives << [
+          page_up_rect.to_sprite(path: 'sprites/page_down.png', flip_vertically: true).merge!(SCROLL_BUTTON_COLOR),
+          one_line_up_rect.to_sprite(path: 'sprites/down.png', flip_vertically: true).merge!(SCROLL_BUTTON_COLOR)
+        ]
+      end
+
+      if can_scroll_down?
+        gtk_outputs.primitives << [
+          page_down_rect.to_sprite(path: 'sprites/page_down.png').merge!(SCROLL_BUTTON_COLOR),
+          one_line_down_rect.to_sprite(path: 'sprites/down.png').merge!(SCROLL_BUTTON_COLOR)
+        ]
+      end
+    end
+
+    SCROLL_BUTTON_COLOR = { r: 100, g: 100, b: 100 }.freeze
+
+    def number_of_visible_lines
+      (@h - (vertical_padding * 2)).idiv(20)
+    end
+
+    def page_up_rect
+      { x: 50, y: @y + @h - 40, w: 30, h: 30 }
+    end
+
+    def one_line_up_rect
+      { x: 50, y: @y + @h - 80, w: 30, h: 30 }
+    end
+
+    def page_down_rect
+      { x: 50, y: @y + 10, w: 30, h: 30 }
+    end
+
+    def one_line_down_rect
+      { x: 50, y: @y + 50, w: 30, h: 30 }
+    end
+
+    def can_scroll_up?
+      @offset.positive?
+    end
+
+    def can_scroll_down?
+      maximum_visible_address < @bytes.length - 1
     end
 
     def format_hex_value(value, byte_count:)
