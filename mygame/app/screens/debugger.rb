@@ -24,6 +24,7 @@ module Screens
 
     def tick(args)
       @state = args.state.debugger
+      @state.pc_at_start_of_tick = @state.game_boy.registers.pc
 
       process_inputs(args)
 
@@ -79,7 +80,7 @@ module Screens
 
     def update_game_boy
       game_boy = @state.game_boy
-      @state.pc_at_start_of_tick = game_boy.registers.pc
+
       @state.operations_to_execute.times do
         game_boy.cpu.execute_next_operation
         if @program_view.breakpoints.key? game_boy.registers.pc
@@ -92,10 +93,17 @@ module Screens
     def update_program_view(args)
       game_boy = @state.game_boy
 
-      scroll_to_pc_if_needed if @state.game_boy.registers.pc != @state.pc_at_start_of_tick
+      keep_pc_visible_in_program_view
 
       @program_view.update(args)
       @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+    end
+
+    def keep_pc_visible_in_program_view
+      pc = @state.game_boy.registers.pc
+      return if pc == @state.pc_at_start_of_tick
+
+      @program_view.offset = pc unless @program_view.address_visible?(pc)
     end
 
     def update_memory_view(args)
@@ -140,12 +148,6 @@ module Screens
 
     def render_vram_view(args)
       @vram_view.render(args.outputs)
-    end
-
-    def scroll_to_pc_if_needed
-      pc = @state.game_boy.registers.pc
-      @program_view.offset = pc unless @program_view.address_visible? pc
-      @memory_view.offset = pc & 0xFFF0 unless @memory_view.address_visible? pc
     end
 
     def reload_comments
