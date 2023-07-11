@@ -24,12 +24,10 @@ module Screens
 
     def tick(args)
       @state = args.state.debugger
-      game_boy = @state.game_boy
 
       process_inputs(args)
 
-      @program_view.update(args)
-      @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+      update_program_view(args)
       send "update_#{@state.displayed_view}_view", args if respond_to? "update_#{@state.displayed_view}_view"
 
       @program_view.render(args.outputs)
@@ -81,7 +79,14 @@ module Screens
       $screen = Screens::RomSelection.new(args) if key_down.escape
     end
 
-    def render_memory_view(args)
+    def update_program_view(args)
+      game_boy = @state.game_boy
+
+      @program_view.update(args)
+      @program_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+    end
+
+    def update_memory_view(args)
       game_boy = @state.game_boy
 
       @memory_view.highlights = []
@@ -90,15 +95,26 @@ module Screens
         color: { r: 200, g: 200, b: 200 },
         size: 3
       }
-      if @program_view.hovered_operation
-        address = @program_view.hovered_operation[:address]
+      hovered_operation = @program_view.hovered_operation
+      if hovered_operation
+        address = hovered_operation[:address]
         @memory_view.highlights << {
-          address: (address..(address + @program_view.hovered_operation[:operation][:length] - 1)),
+          address: (address..(address + hovered_operation[:operation][:length] - 1)),
           color: UI::ProgramView::HOVER_COLOR,
           size: 2
         }
+        if hovered_operation[:target_address]
+          @memory_view.highlights << {
+            address: hovered_operation[:target_address],
+            color: UI::ProgramView::JUMP_TARGET_COLOR,
+            size: 2
+          }
+        end
       end
       @memory_view.highlights << { address: game_boy.registers.pc, color: UI::RegistersView::PC_COLOR }
+    end
+
+    def render_memory_view(args)
       @memory_view.render(args.outputs)
     end
 

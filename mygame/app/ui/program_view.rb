@@ -1,6 +1,7 @@
 module UI
   class ProgramView
     HOVER_COLOR = { r: 255, g: 255, b: 0 }.freeze
+    JUMP_TARGET_COLOR = { r: 255, g: 128, b: 0 }.freeze
 
     attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints, :comments
 
@@ -76,17 +77,32 @@ module UI
           end
         }
 
-        @rendered_operations << {
+        rendered_operation = {
           rect: { x: @x + 10, y: y - 20, w: @w - 20, h: 20 },
           address: address,
           text: "#{operation[:type]} #{argument_strings.join(', ')}",
           comment: @comments[address],
-          operation: operation
+          operation: operation,
+          target_address: calc_target_address(address, operation)
         }
+        rendered_operation.compact!
+        @rendered_operations << rendered_operation
         address += operation[:length]
         break if address >= @bytes.length
 
         y -= 20
+      end
+    end
+
+    def calc_target_address(address, operation)
+      case operation[:type]
+      when :JR
+        address + operation[:length] + operation[:arguments].last
+      when :CALL
+        operation[:arguments].last
+      when :JP
+        target_address = operation[:arguments].last
+        target_address.is_a?(Numeric) ? target_address : nil
       end
     end
 
@@ -99,6 +115,12 @@ module UI
       @highlights << {
         address: hovered_operation[:address],
         color: HOVER_COLOR
+      }
+      return unless hovered_operation[:target_address]
+
+      @highlights << {
+        address: hovered_operation[:target_address],
+        color: JUMP_TARGET_COLOR
       }
     end
 
