@@ -102,10 +102,10 @@ def test_vram_tilemap_tile_primitives(_args, assert)
   tile_primitives = vram.tilemap(1).tile_primitives
 
   assert.equal! tile_primitives[0], {
-    x: 0 * 8, y: (31 - 0) * 8, w: 8, h: 8, path: 'tile0'
+    x: 0 * 8, y: (31 - 0) * 8, w: 8, h: 8, path: 'tile_0'
   }.sprite!
   # 100 = 3 * 32 + 4, i.e. 4th tile on 3rd row
   assert.equal! tile_primitives[100], {
-    x: 4 * 8, y: (31 - 3) * 8, w: 8, h: 8, path: 'tile33'
+    x: 4 * 8, y: (31 - 3) * 8, w: 8, h: 8, path: 'tile_33'
   }.sprite!
 end
