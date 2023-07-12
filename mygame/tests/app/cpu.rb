@@ -91,6 +91,18 @@ def test_cpu_execute_operation_ld_pointer_into_register(_args, assert)
   assert.equal! registers.a, 0x12
 end
 
+def test_cpu_execute_operation_ld_register_into_constant_pointer(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :LD, arguments: [Operation::Pointer[0x9910], :A])
+  registers.a = 0x12
+
+  cpu.execute operation
+
+  assert.equal! memory[0x9910], 0x12
+end
+
 def test_cpu_execute_operation_ld_register_into_0xFF00_pointer(_args, assert)
   registers = Registers.new
   memory = Memory.new

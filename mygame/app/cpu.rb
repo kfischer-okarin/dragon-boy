@@ -31,7 +31,8 @@ class CPU
 
     case target
     when Operation::Pointer
-      address = @registers.send(target.address.downcase)
+      address = target.address
+      address = @registers.send(address.downcase) if address.is_a? Symbol
       address += 0xFF00 if target.address == :C
       @memory[address] = value
     else
