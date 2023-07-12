@@ -17,7 +17,7 @@ module Screens
       @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
       @sound_view = UI::SoundView.new(game_boy.io, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
-      @vram_view = UI::VRAMView.new(game_boy.vram, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
+      @vram_tiles_view = UI::VRAMTilesView.new(game_boy.vram, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
 
       @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
     end
@@ -62,7 +62,7 @@ module Screens
       elsif key_down.two
         @state.displayed_view = :sound
       elsif key_down.three
-        @state.displayed_view = :vram
+        @state.displayed_view = :vram_tiles
       end
 
       reload_comments if key_down.c
@@ -139,12 +139,12 @@ module Screens
       @sound_view.render(args.outputs)
     end
 
-    def update_vram_view(args)
-      @vram_view.update(args)
+    def update_vram_tiles_view(args)
+      @vram_tiles_view.update(args)
     end
 
-    def render_vram_view(args)
-      @vram_view.render(args.outputs)
+    def render_vram_tiles_view(args)
+      @vram_tiles_view.render(args.outputs)
     end
 
     def update_misc_info_view

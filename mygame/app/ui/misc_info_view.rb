@@ -34,7 +34,7 @@ module UI
     VIEWS = {
       memory: '1) Memory',
       sound: '2) Sound Channels',
-      vram: '3) Tiles & Objects'
+      vram_tiles: '3) Tiles & Objects'
     }
   end
 end

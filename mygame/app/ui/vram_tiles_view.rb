@@ -1,5 +1,5 @@
 module UI
-  class VRAMView
+  class VRAMTilesView
     attr_accessor :vram, :x, :y, :w, :h
 
     attr_rect
