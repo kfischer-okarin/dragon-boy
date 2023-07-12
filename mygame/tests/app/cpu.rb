@@ -326,6 +326,18 @@ def test_cpu_execute_operation_dec_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_jr(_args, assert)
+  registers = Registers.new
+  memory = Memory.new
+  cpu = CPU.new registers: registers, memory: memory
+  operation = CPUTests.operation(type: :JR, arguments: [-13], length: 2)
+  registers.pc = 0x0120
+
+  cpu.execute operation
+
+  assert.equal! registers.pc, 0x0120 + 2 - 13
+end
+
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new

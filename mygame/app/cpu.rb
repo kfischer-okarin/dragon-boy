@@ -115,11 +115,18 @@ class CPU
   end
 
   def execute_JR(operation)
-    if condition_fulfilled? operation[:arguments][0]
-      @registers.pc += operation[:arguments][1]
-      operation[:cycles][:taken]
+    arguments = operation[:arguments]
+    case arguments[0]
+    when Symbol
+      if condition_fulfilled? arguments[0]
+        @registers.pc += arguments[1]
+        operation[:cycles][:taken]
+      else
+        operation[:cycles][:untaken]
+      end
     else
-      operation[:cycles][:untaken]
+      @registers.pc += arguments[0]
+      operation[:cycles]
     end
   end
 
