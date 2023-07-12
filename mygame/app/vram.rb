@@ -14,8 +14,10 @@ class VRAM
       @values[address - 0x8000] = 0
     end
     @tiles = 384.times.map { Tile.new }
-    @tilemaps[0].tile_indexes = Array.new(32 * 32) { 0 }
-    @tilemaps[1].tile_indexes = Array.new(32 * 32) { 0 }
+    (32 * 32).times do |i|
+      @tilemaps[0][i] = 0
+      @tilemaps[1][i] = 0
+    end
   end
 
   def [](address)
@@ -35,9 +37,9 @@ class VRAM
       tile_index = (address - 0x8000).idiv 16
       @dirty_tiles[tile_index] = true
     when 0x9800..0x9BFF
-      @tilemaps[0].tile_indexes[(address - 0x9800)] = value
+      @tilemaps[0][(address - 0x9800)] = value
     when 0x9C00..0x9FFF
-      @tilemaps[1].tile_indexes[(address - 0x9C00)] = value
+      @tilemaps[1][(address - 0x9C00)] = value
     else
       raise 'Illegal VRAM address: %04X' % address
     end
@@ -103,10 +105,16 @@ class VRAM
   end
 
   class Tilemap
-    attr_accessor :tile_indexes
-
     def initialize
       @tile_indexes = Array.new(32 * 32)
+    end
+
+    def [](index)
+      @tile_indexes[index]
+    end
+
+    def []=(index, value)
+      @tile_indexes[index] = value
     end
 
     def tile_primitives

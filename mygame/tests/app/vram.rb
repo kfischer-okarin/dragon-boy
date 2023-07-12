@@ -82,10 +82,7 @@ def test_vram_tilemap0(_args, assert)
 
   vram[0x9910] = 22
 
-  expected_tile_indexes = [0] * 32 * 32
-  expected_tile_indexes[0x0110] = 22
-
-  assert.equal! vram.tilemap(0).tile_indexes, expected_tile_indexes
+  assert.equal! vram.tilemap(0)[0x0110], 22
 end
 
 def test_vram_tilemap1(_args, assert)
@@ -94,16 +91,13 @@ def test_vram_tilemap1(_args, assert)
 
   vram[0x9D10] = 22
 
-  expected_tile_indexes = [0] * 32 * 32
-  expected_tile_indexes[0x0110] = 22
-
-  assert.equal! vram.tilemap(1).tile_indexes, expected_tile_indexes
+  assert.equal! vram.tilemap(1)[0x0110], 22
 end
 
 def test_vram_tilemap_tile_primitives(_args, assert)
   vram = VRAM.new
   vram.clear
-  vram.tilemap(1).tile_indexes[100] = 33
+  vram.tilemap(1)[100] = 33
 
   tile_primitives = vram.tilemap(1).tile_primitives
 
