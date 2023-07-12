@@ -99,3 +99,19 @@ def test_vram_tilemap1(_args, assert)
 
   assert.equal! vram.tilemap(1).tile_indexes, expected_tile_indexes
 end
+
+def test_vram_tilemap_tile_primitives(_args, assert)
+  vram = VRAM.new
+  vram.clear
+  vram.tilemap(1).tile_indexes[100] = 33
+
+  tile_primitives = vram.tilemap(1).tile_primitives
+
+  assert.equal! tile_primitives[0], {
+    x: 0, y: 31 * 8, w: 8, h: 8, path: 'tile0'
+  }.sprite!
+  assert.equal! tile_primitives[100], {
+    x: 4 * 8, y: (31 - 3) * 8, w: 8, h: 8, path: 'tile33'
+  }.sprite!
+
+end

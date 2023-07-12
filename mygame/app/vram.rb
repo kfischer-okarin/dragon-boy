@@ -108,6 +108,15 @@ class VRAM
     def initialize
       @tile_indexes = Array.new(32 * 32)
     end
+
+    def tile_primitives
+      @tile_indexes.map_with_index { |tile_index, index|
+        {
+          x: (index % 32) * 8, y: (31 - index.idiv(32)) * 8, w: 8, h: 8,
+          path: "tile#{tile_index}"
+        }.sprite!
+      }
+    end
   end
 
   private
