@@ -1,5 +1,5 @@
 class GameBoyIO
-  attr_reader :palettes, :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4
+  attr_reader :palettes, :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4, :viewport_position
 
   def initialize
     @values = {}
@@ -9,6 +9,7 @@ class GameBoyIO
     @sound_channel2 = {}
     @sound_channel3 = {}
     @sound_channel4 = {}
+    @viewport_position = {}
   end
 
   def [](address)
@@ -53,6 +54,10 @@ class GameBoyIO
       @sound_channel4[:panning] = panning(value, 0b10000000, 0b00001000)
     when 0xFF26
       @sound[:enabled] = value & 0b10000000 != 0
+    when 0xFF42
+      @viewport_position[:y] = value
+    when 0xFF43
+      @viewport_position[:x] = value
     when 0xFF00..0xFF7F
       # Not yet implemented
     else
