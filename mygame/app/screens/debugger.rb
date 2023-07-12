@@ -41,15 +41,6 @@ module Screens
 
     private
 
-    def load_comments(game_boy)
-      result = {}
-      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
-      result.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
-      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
-      result.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
-      result
-    end
-
     def process_inputs(args)
       key_down = args.inputs.keyboard.key_down
 
@@ -156,7 +147,12 @@ module Screens
     end
 
     def reload_comments
-      @program_view.comments = load_comments(@state.game_boy)
+      game_boy = @state.game_boy
+      @program_view.comments = comments = {}
+      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
+      comments.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
+      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
+      comments.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
     end
   end
 end
