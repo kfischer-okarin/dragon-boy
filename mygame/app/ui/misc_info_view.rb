@@ -1,6 +1,6 @@
 module UI
   class MiscInfoView
-    attr_accessor :x, :y, :w, :h
+    attr_accessor :x, :y, :w, :h, :active_view
 
     attr_rect
 
@@ -22,6 +22,19 @@ module UI
       gtk_outputs.primitives << { x: x, y: y, text: "Cycles: #{@game_boy.cpu.cycles}" }.label!
       y -= 20
       gtk_outputs.primitives << { x: x, y: y, text: "FPS: #{$gtk.current_framerate.to_i}" }.label!
+
+      y -= 40
+      VIEWS.each do |key, text|
+        color = @active_view == key ? { r: 0, g: 150, b: 0 } : { r: 0, g: 0, b: 0 }
+        gtk_outputs.primitives << { x: x, y: y, text: text }.label!(color)
+        y -= 20
+      end
     end
+
+    VIEWS = {
+      memory: '1) Memory',
+      sound: '2) Sound Channels',
+      vram: '3) Tiles & Objects'
+    }
   end
 end

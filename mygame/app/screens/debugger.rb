@@ -32,6 +32,7 @@ module Screens
 
       update_program_view(args)
       send "update_#{@state.displayed_view}_view", args if respond_to? "update_#{@state.displayed_view}_view"
+      update_misc_info_view
 
       @program_view.render(args.outputs)
       @registers_view.render(args.outputs)
@@ -144,6 +145,10 @@ module Screens
 
     def render_vram_view(args)
       @vram_view.render(args.outputs)
+    end
+
+    def update_misc_info_view
+      @misc_info_view.active_view = @state.displayed_view
     end
 
     def reload_comments
