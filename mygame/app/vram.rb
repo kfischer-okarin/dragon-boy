@@ -2,7 +2,7 @@ class VRAM
   attr_reader :palettes
 
   def initialize
-    @values = {}
+    @values = []
     @palettes = {}
     @tiles = []
     @dirty_tiles = {}
@@ -10,13 +10,13 @@ class VRAM
 
   def clear
     0x8000.upto(0x9FFF) do |address|
-      @values[address] = 0
+      @values[address - 0x8000] = 0
     end
     @tiles = 384.times.map { Tile.new }
   end
 
   def [](address)
-    @values[address]
+    @values[address - 0x8000]
   end
 
   def []=(address, value)
@@ -34,7 +34,7 @@ class VRAM
     else
       raise 'Illegal VRAM address: %04X' % address
     end
-    @values[address] = value
+    @values[address - 0x8000] = value
   end
 
   def tile(tile_index)
@@ -48,7 +48,7 @@ class VRAM
     updated_tiles.each do |tile_index|
       pixels = Array.new(64) { 0 }
 
-      tile_address = 0x8000 + (tile_index * 16)
+      tile_address = (tile_index * 16)
       8.times do |y_from_top|
         low_byte = @values[tile_address + (y_from_top * 2)]
         high_byte = @values[tile_address + (y_from_top * 2) + 1]
