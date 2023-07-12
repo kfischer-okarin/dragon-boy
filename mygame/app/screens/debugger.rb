@@ -1,5 +1,11 @@
 module Screens
   class Debugger
+    TABS = {
+      memory: 'Memory',
+      sound: 'Sound Channels',
+      vram_tiles: 'Tiles & Objects'
+    }.freeze
+
     def initialize(args, game_boy:)
       args.state.debugger = args.state.new_entity(:debugger) do |state|
         state.game_boy = game_boy
@@ -57,12 +63,12 @@ module Screens
         @state.running = true if key_down.enter
       end
 
-      if key_down.one
-        @state.displayed_view = :memory
-      elsif key_down.two
-        @state.displayed_view = :sound
-      elsif key_down.three
-        @state.displayed_view = :vram_tiles
+      number_keys = [:one, :two, :three, :four, :five, :six, :seven, :eight, :nine, :zero]
+      TABS.keys.each_with_index do |key, index|
+        if key_down.send(number_keys[index])
+          @state.displayed_view = key
+          break
+        end
       end
 
       reload_comments if key_down.c

@@ -24,9 +24,10 @@ module UI
       gtk_outputs.primitives << { x: x, y: y, text: "FPS: #{$gtk.current_framerate.to_i}" }.label!
 
       y -= 40
-      VIEWS.each do |key, text|
+      debugger_tabs = Screens::Debugger::TABS
+      debugger_tabs.keys.each_with_index do |key, index|
         color = @active_view == key ? { r: 0, g: 150, b: 0 } : { r: 0, g: 0, b: 0 }
-        gtk_outputs.primitives << { x: x, y: y, text: text }.label!(color)
+        gtk_outputs.primitives << { x: x, y: y, text: "#{index + 1}) #{debugger_tabs[key]}" }.label!(color)
         y -= 20
       end
     end
