@@ -12,6 +12,7 @@ require 'app/ui/misc_info_view.rb'
 require 'app/ui/program_view.rb'
 require 'app/ui/registers_view.rb'
 require 'app/ui/sound_view.rb'
+require 'app/ui/vram_tilemaps_view.rb'
 require 'app/ui/vram_tiles_view.rb'
 
 def tick(args)
