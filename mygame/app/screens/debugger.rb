@@ -20,10 +20,11 @@ module Screens
       reload_comments
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
 
-      @memory_view = UI::MemoryView.new(game_boy.memory, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
+      right_view_rect = { x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h }
+      @memory_view = UI::MemoryView.new(game_boy.memory, **right_view_rect)
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
-      @sound_view = UI::SoundView.new(game_boy.io, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
-      @vram_tiles_view = UI::VRAMTilesView.new(game_boy.vram, x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h)
+      @sound_view = UI::SoundView.new(game_boy.io, **right_view_rect)
+      @vram_tiles_view = UI::VRAMTilesView.new(game_boy.vram, **right_view_rect)
 
       @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
     end
