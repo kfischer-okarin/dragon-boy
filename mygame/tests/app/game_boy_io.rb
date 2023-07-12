@@ -194,3 +194,33 @@ def test_io_viewport_position(_args, assert)
 
   assert.equal! io.viewport_position, { x: 222, y: 123 }
 end
+
+def test_io_lcd(_args, assert)
+  io = GameBoyIO.new
+
+  io[0xFF40] = 0b11111111
+
+  assert.equal! io.lcd, {
+    on: true,
+    window_tilemap: 1,
+    window_enabled: true,
+    bg_window_tiles_start_address: 0x8000,
+    bg_tilemap: 1,
+    sprite_height: 16,
+    sprites_enabled: true,
+    bg_enabled: true
+  }
+
+  io[0xFF40] = 0b00000000
+
+  assert.equal! io.lcd, {
+    on: false,
+    window_tilemap: 0,
+    window_enabled: false,
+    bg_window_tiles_start_address: 0x8800,
+    bg_tilemap: 0,
+    sprite_height: 8,
+    sprites_enabled: false,
+    bg_enabled: false
+  }
+end
