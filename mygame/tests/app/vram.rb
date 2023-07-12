@@ -75,3 +75,27 @@ def test_vram_tile_pixel_primitives(_args, assert)
     { x: 3, y: 5, w: 1, h: 1, path: :pixel, r: 0, g: 0, b: 0 }.sprite!
   ]
 end
+
+def test_vram_tilemap0(_args, assert)
+  vram = VRAM.new
+  vram.clear
+
+  vram[0x9910] = 22
+
+  expected_tile_indexes = [0] * 32 * 32
+  expected_tile_indexes[0x0110] = 22
+
+  assert.equal! vram.tilemap(0).tile_indexes, expected_tile_indexes
+end
+
+def test_vram_tilemap1(_args, assert)
+  vram = VRAM.new
+  vram.clear
+
+  vram[0x9D10] = 22
+
+  expected_tile_indexes = [0] * 32 * 32
+  expected_tile_indexes[0x0110] = 22
+
+  assert.equal! vram.tilemap(1).tile_indexes, expected_tile_indexes
+end

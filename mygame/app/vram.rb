@@ -6,6 +6,7 @@ class VRAM
     @palettes = {}
     @tiles = []
     @dirty_tiles = {}
+    @tilemaps = [Tilemap.new, Tilemap.new]
   end
 
   def clear
@@ -13,6 +14,8 @@ class VRAM
       @values[address - 0x8000] = 0
     end
     @tiles = 384.times.map { Tile.new }
+    @tilemaps[0].tile_indexes = Array.new(32 * 32) { 0 }
+    @tilemaps[1].tile_indexes = Array.new(32 * 32) { 0 }
   end
 
   def [](address)
@@ -28,9 +31,13 @@ class VRAM
         palette_color((value & 0b00110000) >> 4),
         palette_color((value & 0b11000000) >> 6)
       ]
-    when 0x8000..0x9FFF
+    when 0x8000..0x97FF
       tile_index = (address - 0x8000).idiv 16
       @dirty_tiles[tile_index] = true
+    when 0x9800..0x9BFF
+      @tilemaps[0].tile_indexes[(address - 0x9800)] = value
+    when 0x9C00..0x9FFF
+      @tilemaps[1].tile_indexes[(address - 0x9C00)] = value
     else
       raise 'Illegal VRAM address: %04X' % address
     end
@@ -39,6 +46,10 @@ class VRAM
 
   def tile(tile_index)
     @tiles[tile_index] ||= Tile.new
+  end
+
+  def tilemap(tilemap_index)
+    @tilemaps[tilemap_index]
   end
 
   def update_dirty_tiles
@@ -88,6 +99,14 @@ class VRAM
       end
 
       result
+    end
+  end
+
+  class Tilemap
+    attr_accessor :tile_indexes
+
+    def initialize
+      @tile_indexes = Array.new(32 * 32)
     end
   end
 
