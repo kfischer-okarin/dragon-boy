@@ -19,8 +19,8 @@ end
 
 def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
   [
-    CPUTests.operation(type: :NOP, arguments: [], cycles: 4),
-    CPUTests.operation(type: :LD, arguments: [:A, 0x12], cycles: 8)
+    CPUTests.operation(type: :NOP, arguments: [], cycles: 16),
+    CPUTests.operation(type: :LD, arguments: [:A, 0x12], cycles: 32)
   ].each do |operation|
     registers = Registers.new
     memory = Memory.new
@@ -342,34 +342,34 @@ def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 12, untaken: 8 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 48, untaken: 32 })
   registers.pc = 0x0120
   registers.flag_z = 0
 
   cpu.execute operation
 
   assert.equal! registers.pc, 0x0120 + 2 - 12
-  assert.equal! cpu.cycles, 12
+  assert.equal! cpu.cycles, 48
 end
 
 def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 12, untaken: 8 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 48, untaken: 32 })
   registers.pc = 0x0120
   registers.flag_z = 1
 
   cpu.execute operation
 
   assert.equal! registers.pc, 0x0120 + 2
-  assert.equal! cpu.cycles, 8
+  assert.equal! cpu.cycles, 32
 end
 
 def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_not_change_any_flags(
-      { type: :JR, arguments: [:NZ, -12], cycles: { taken: 12, untaken: 8 } },
+      { type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 } },
     )
   end
 end
@@ -688,7 +688,7 @@ module CPUTests
   class << self
     def operation(operation)
       # Add some defaults so that execute doesn't fail
-      { length: 1, cycles: 4, opcode: 0x00 }.merge operation
+      { length: 1, cycles: 16, opcode: 0x00 }.merge operation
     end
 
     def test_flags(assert, &block)

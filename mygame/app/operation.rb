@@ -32,7 +32,7 @@ module Operation
                 end
               },
               length: definition['bytes'],
-              cycles: cycles.size == 1 ? cycles[0] : { taken: cycles[0], untaken: cycles[1] }
+              cycles: cycles.size == 1 ? cycles[0] * 4 : { taken: cycles[0] * 4, untaken: cycles[1] * 4 }
             }
           end
           @opcodes[type.to_sym] = result
