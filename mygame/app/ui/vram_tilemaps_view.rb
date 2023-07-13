@@ -29,6 +29,15 @@ module UI
       y -= 40
       render_tilemap(gtk_outputs, 0, left_column_x, y)
       render_tilemap(gtk_outputs, 1, right_column_x, y)
+      y -= 256 + 20
+      gtk_outputs.primitives << {
+        x: left_column_x, y: y, text: 'If above tilemaps are odd try displaying "Tiles & Objects"'
+      }.label!
+      y -= 20
+      gtk_outputs.primitives << {
+        x: left_column_x, y: y, text: 'first to refresh the tiles'
+      }.label!
+      # TODO: Fix this
     end
 
     def vertical_padding
