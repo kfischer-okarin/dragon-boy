@@ -3,9 +3,7 @@ def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
     CPUTests.operation(type: :NOP, arguments: [], cycles: 16),
     CPUTests.operation(type: :LD, arguments: [:A, 0x12], cycles: 32)
   ].each do |operation|
-    registers = Registers.new
-    memory = Memory.new
-    cpu = CPU.new registers: registers, memory: memory
+    cpu = CPUTests.build_cpu
 
     cpu.execute operation
 
@@ -16,17 +14,15 @@ def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
 end
 
 def test_cpu_execute_operation_nop(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :NOP, arguments: [])
-  registers_before = registers.to_h
-  memory_before = memory.to_a
+  registers_before = cpu.registers.to_h
+  memory_before = cpu.memory.to_a
 
   cpu.execute operation
 
-  assert.equal! registers.to_h.except(:pc), registers_before.except(:pc)
-  assert.equal! memory.to_a, memory_before
+  assert.equal! cpu.registers.to_h.except(:pc), registers_before.except(:pc)
+  assert.equal! cpu.memory.to_a, memory_before
 end
 
 def test_cpu_execute_operation_nop_flags(_args, assert)
@@ -36,65 +32,55 @@ def test_cpu_execute_operation_nop_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_ld_constant_into_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LD, arguments: [:SP, 0x2345])
 
   cpu.execute operation
 
-  assert.equal! registers.sp, 0x2345
+  assert.equal! cpu.registers.sp, 0x2345
 end
 
 def test_cpu_execute_operation_ld_register_into_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LD, arguments: [Operation::Pointer[:DE], :A])
-  registers.a = 0x12
-  registers.de = 0xCDEF
+  cpu.registers.a = 0x12
+  cpu.registers.de = 0xCDEF
 
   cpu.execute operation
 
-  assert.equal! memory[0xCDEF], 0x12
+  assert.equal! cpu.memory[0xCDEF], 0x12
 end
 
 def test_cpu_execute_operation_ld_pointer_into_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LD, arguments: [:A, Operation::Pointer[:DE]])
-  registers.de = 0xCDEF
-  memory[0xCDEF] = 0x12
+  cpu.registers.de = 0xCDEF
+  cpu.memory[0xCDEF] = 0x12
 
   cpu.execute operation
 
-  assert.equal! registers.a, 0x12
+  assert.equal! cpu.registers.a, 0x12
 end
 
 def test_cpu_execute_operation_ld_register_into_constant_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LD, arguments: [Operation::Pointer[0x9910], :A])
-  registers.a = 0x12
+  cpu.registers.a = 0x12
 
   cpu.execute operation
 
-  assert.equal! memory[0x9910], 0x12
+  assert.equal! cpu.memory[0x9910], 0x12
 end
 
 def test_cpu_execute_operation_ld_register_into_0xFF00_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LD, arguments: [Operation::Pointer[:C], :A])
-  registers.a = 0x12
-  registers.c = 0x34
+  cpu.registers.a = 0x12
+  cpu.registers.c = 0x34
 
   cpu.execute operation
 
-  assert.equal! memory[0xFF34], 0x12
+  assert.equal! cpu.memory[0xFF34], 0x12
 end
 
 def test_cpu_execute_operation_ld_flags(_args, assert)
@@ -104,15 +90,13 @@ def test_cpu_execute_operation_ld_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_ldh_A_into_0xFF00_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LDH, arguments: [Operation::Pointer[0x80], :A])
-  registers.a = 0x99
+  cpu.registers.a = 0x99
 
   cpu.execute operation
 
-  assert.equal! memory[0xFF80], 0x99
+  assert.equal! cpu.memory[0xFF80], 0x99
 end
 
 def test_cpu_execute_operation_ldh_flags(_args, assert)
@@ -122,18 +106,16 @@ def test_cpu_execute_operation_ldh_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_ldi_a_into_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LDI, arguments: [Operation::Pointer[:HL], :A])
-  registers.a = 0x12
-  registers.hl = 0x9FFF
-  memory[0x9FFF] = 0x56
+  cpu.registers.a = 0x12
+  cpu.registers.hl = 0x9FFF
+  cpu.memory[0x9FFF] = 0x56
 
   cpu.execute operation
 
-  assert.equal! memory[0x9FFF], 0x12, 'Expected memory[0x9FFF] to be 0x12 but was 0x%02X' % memory[0x9FFF]
-  assert.equal! registers.hl, 0xA000, 'Expected HL to be 0xA000 but was 0x%04X' % registers.hl
+  assert.equal! cpu.memory[0x9FFF], 0x12, 'Expected memory[0x9FFF] to be 0x12 but was 0x%02X' % cpu.memory[0x9FFF]
+  assert.equal! cpu.registers.hl, 0xA000, 'Expected HL to be 0xA000 but was 0x%04X' % cpu.registers.hl
 end
 
 def test_cpu_execute_operation_ldi_flags(_args, assert)
@@ -149,18 +131,16 @@ def test_cpu_execute_operation_ldi_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_ldd_a_into_pointer(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :LDD, arguments: [Operation::Pointer[:HL], :A])
-  registers.a = 0x12
-  registers.hl = 0x9FFF
-  memory[0x9FFF] = 0x56
+  cpu.registers.a = 0x12
+  cpu.registers.hl = 0x9FFF
+  cpu.memory[0x9FFF] = 0x56
 
   cpu.execute operation
 
-  assert.equal! memory[0x9FFF], 0x12, 'Expected memory[0x9FFF] to be 0x12 but was 0x%02X' % memory[0x9FFF]
-  assert.equal! registers.hl, 0x9FFE, 'Expected HL to be 0x9FFE but was 0x%04X' % registers.hl
+  assert.equal! cpu.memory[0x9FFF], 0x12, 'Expected memory[0x9FFF] to be 0x12 but was 0x%02X' % cpu.memory[0x9FFF]
+  assert.equal! cpu.registers.hl, 0x9FFE, 'Expected HL to be 0x9FFE but was 0x%04X' % cpu.registers.hl
 end
 
 def test_cpu_execute_operation_ldd_flags(_args, assert)
@@ -176,21 +156,19 @@ def test_cpu_execute_operation_ldd_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_inc_8bit_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :INC, arguments: [:C])
-  registers.c = 0x12
+  cpu.registers.c = 0x12
 
   cpu.execute operation
 
-  assert.equal! registers.c, 0x13
+  assert.equal! cpu.registers.c, 0x13
 
-  registers.c = 0xFF
+  cpu.registers.c = 0xFF
 
   cpu.execute operation
 
-  assert.equal! registers.c, 0x00
+  assert.equal! cpu.registers.c, 0x00
 end
 
 def test_cpu_execute_operation_inc_8bit_register_flags(_args, assert)
@@ -230,21 +208,19 @@ def test_cpu_execute_operation_inc_8bit_register_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_inc_16bit_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :INC, arguments: [:BC])
-  registers.bc = 0x1234
+  cpu.registers.bc = 0x1234
 
   cpu.execute operation
 
-  assert.equal! registers.bc, 0x1235
+  assert.equal! cpu.registers.bc, 0x1235
 
-  registers.bc = 0xFFFF
+  cpu.registers.bc = 0xFFFF
 
   cpu.execute operation
 
-  assert.equal! registers.bc, 0x0000
+  assert.equal! cpu.registers.bc, 0x0000
 end
 
 def test_cpu_execute_operation_inc_16bit_register_flags(_args, assert)
@@ -254,21 +230,19 @@ def test_cpu_execute_operation_inc_16bit_register_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_decc_8bit_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :DEC, arguments: [:C])
-  registers.c = 0x12
+  cpu.registers.c = 0x12
 
   cpu.execute operation
 
-  assert.equal! registers.c, 0x11
+  assert.equal! cpu.registers.c, 0x11
 
-  registers.c = 0x00
+  cpu.registers.c = 0x00
 
   cpu.execute operation
 
-  assert.equal! registers.c, 0xFF
+  assert.equal! cpu.registers.c, 0xFF
 end
 
 def test_cpu_execute_operation_dec_flags(_args, assert)
@@ -308,42 +282,36 @@ def test_cpu_execute_operation_dec_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_jr(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :JR, arguments: [-13])
-  registers.pc = 0x0120
+  cpu.registers.pc = 0x0120
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120 - 13
+  assert.equal! cpu.registers.pc, 0x0120 - 13
 end
 
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
-  registers.pc = 0x0120
-  registers.flag_z = 0
+  cpu.registers.pc = 0x0120
+  cpu.registers.flag_z = 0
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120 - 12
+  assert.equal! cpu.registers.pc, 0x0120 - 12
   assert.equal! cpu.cycles, 48
 end
 
 def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
-  registers.pc = 0x0120
-  registers.flag_z = 1
+  cpu.registers.pc = 0x0120
+  cpu.registers.flag_z = 1
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120
+  assert.equal! cpu.registers.pc, 0x0120
   assert.equal! cpu.cycles, 32
 end
 
@@ -356,19 +324,17 @@ def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_call(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :CALL, arguments: [0x0095])
-  registers.pc = 0x0120
-  registers.sp = 0xFFFE
+  cpu.registers.pc = 0x0120
+  cpu.registers.sp = 0xFFFE
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0095
-  assert.equal! registers.sp, 0xFFFC
-  assert.equal! memory[0xFFFC], 0x20
-  assert.equal! memory[0xFFFD], 0x01
+  assert.equal! cpu.registers.pc, 0x0095
+  assert.equal! cpu.registers.sp, 0xFFFC
+  assert.equal! cpu.memory[0xFFFC], 0x20
+  assert.equal! cpu.memory[0xFFFD], 0x01
 end
 
 def test_cpu_execute_operation_call_flags(_args, assert)
@@ -380,19 +346,17 @@ def test_cpu_execute_operation_call_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_ret(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :RET, arguments: [])
-  registers.pc = 0x0120
-  registers.sp = 0xFFFC
-  memory[0xFFFC] = 0x45
-  memory[0xFFFD] = 0x03
+  cpu.registers.pc = 0x0120
+  cpu.registers.sp = 0xFFFC
+  cpu.memory[0xFFFC] = 0x45
+  cpu.memory[0xFFFD] = 0x03
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0345
-  assert.equal! registers.sp, 0xFFFE
+  assert.equal! cpu.registers.pc, 0x0345
+  assert.equal! cpu.registers.sp, 0xFFFE
 end
 
 def test_cpu_execute_operation_ret_flags(_args, assert)
@@ -409,18 +373,16 @@ def test_cpu_execute_operation_ret_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_push_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :PUSH, arguments: [:BC])
-  registers.bc = 0x1234
-  registers.sp = 0xFFFE
+  cpu.registers.bc = 0x1234
+  cpu.registers.sp = 0xFFFE
 
   cpu.execute operation
 
-  assert.equal! registers.sp, 0xFFFC
-  assert.equal! memory[0xFFFC], 0x34
-  assert.equal! memory[0xFFFD], 0x12
+  assert.equal! cpu.registers.sp, 0xFFFC
+  assert.equal! cpu.memory[0xFFFC], 0x34
+  assert.equal! cpu.memory[0xFFFD], 0x12
 end
 
 def test_cpu_execute_operation_push_flags(_args, assert)
@@ -436,18 +398,16 @@ def test_cpu_execute_operation_push_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_pop_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :POP, arguments: [:BC])
-  registers.sp = 0xFFFC
-  memory[0xFFFC] = 0x34
-  memory[0xFFFD] = 0x12
+  cpu.registers.sp = 0xFFFC
+  cpu.memory[0xFFFC] = 0x34
+  cpu.memory[0xFFFD] = 0x12
 
   cpu.execute operation
 
-  assert.equal! registers.sp, 0xFFFE
-  assert.equal! registers.bc, 0x1234
+  assert.equal! cpu.registers.sp, 0xFFFE
+  assert.equal! cpu.registers.bc, 0x1234
 end
 
 def test_cpu_execute_operation_pop_flags(_args, assert)
@@ -464,17 +424,15 @@ def test_cpu_execute_operation_pop_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_xor_register_with_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
 
-  registers.a = 0b00001111
-  registers.b = 0b10101010
+  cpu.registers.a = 0b00001111
+  cpu.registers.b = 0b10101010
   operation = CPUTests.operation(type: :XOR, arguments: [:A, :B])
 
   cpu.execute operation
 
-  assert.equal! registers.a, 0b10100101
+  assert.equal! cpu.registers.a, 0b10100101
 end
 
 def test_cpu_execute_operation_xor_flags(_args, assert)
@@ -502,17 +460,15 @@ def test_cpu_execute_operation_xor_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_rl_on_register(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :RL, arguments: [:C])
-  registers.c = 0b10110100
-  registers.flag_c = 1
+  cpu.registers.c = 0b10110100
+  cpu.registers.flag_c = 1
 
   cpu.execute operation
 
-  assert.equal! registers.c, 0b01101001
-  assert.equal! registers.flag_c, 1
+  assert.equal! cpu.registers.c, 0b01101001
+  assert.equal! cpu.registers.flag_c, 1
 end
 
 def test_cpu_execute_operation_rl_flags(_args, assert)
@@ -537,17 +493,15 @@ def test_cpu_execute_operation_rl_flags(_args, assert)
 end
 
 def test_cpu_execute_operation_rla(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
+  cpu = CPUTests.build_cpu
   operation = CPUTests.operation(type: :RLA, arguments: [])
-  registers.a = 0b10110100
-  registers.flag_c = 1
+  cpu.registers.a = 0b10110100
+  cpu.registers.flag_c = 1
 
   cpu.execute operation
 
-  assert.equal! registers.a, 0b01101001
-  assert.equal! registers.flag_c, 1
+  assert.equal! cpu.registers.a, 0b01101001
+  assert.equal! cpu.registers.flag_c, 1
 end
 
 def test_cpu_execute_operation_rla_flags(_args, assert)
@@ -649,11 +603,9 @@ def test_cpu_execute_operation_cp_with_constant(_args, assert)
 end
 
 def test_cpu_execute_next_operation(_args, assert)
-  registers = Registers.new
-  memory = Memory.new
-  cpu = CPU.new registers: registers, memory: memory
-  memory.load_rom "\x00\x00\x02"
-  registers.pc = 0x0002
+  cpu = CPUTests.build_cpu
+  cpu.memory.load_rom "\x00\x00\x02"
+  cpu.registers.pc = 0x0002
 
   executed_operation = nil
   cpu.define_singleton_method :execute do |operation|
@@ -663,11 +615,15 @@ def test_cpu_execute_next_operation(_args, assert)
   cpu.execute_next_operation
 
   assert.equal! executed_operation[:opcode], 0x02
-  assert.equal! registers.pc, 0x0003
+  assert.equal! cpu.registers.pc, 0x0003
 end
 
 module CPUTests
   class << self
+    def build_cpu
+      CPU.new registers: Registers.new, memory: Memory.new
+    end
+
     def operation(operation)
       # Add some defaults so that execute doesn't fail
       { length: 1, cycles: 16, opcode: 0x00 }.merge operation
@@ -689,15 +645,13 @@ module CPUTests
 
     def operation_will_ignore_flags(operation, ignored_flags, given: nil)
       all_flag_combinations.each do |flags|
-        registers = Registers.new
-        memory = Memory.new
-        cpu = CPU.new registers: registers, memory: memory
-        registers.flags = flags
-        given&.call(registers, memory)
+        cpu = CPUTests.build_cpu
+        cpu.registers.flags = flags
+        given&.call(cpu.registers, cpu.memory)
 
         cpu.execute CPUTests.operation(operation)
 
-        actual_flags = registers.flags.slice(*ignored_flags)
+        actual_flags = cpu.registers.flags.slice(*ignored_flags)
         @assert.equal! actual_flags,
                        flags.slice(*ignored_flags),
                        "Expected flags #{ignored_flags} not to change after executing #{operation} but " \
@@ -707,15 +661,13 @@ module CPUTests
 
     def operation_will_set_flags(operation, to:, given: nil)
       all_flag_combinations.each do |flags|
-        registers = Registers.new
-        memory = Memory.new
-        cpu = CPU.new registers: registers, memory: memory
-        registers.flags = flags
-        given&.call(registers, memory)
+        cpu = CPUTests.build_cpu
+        cpu.registers.flags = flags
+        given&.call(cpu.registers, cpu.memory)
 
         cpu.execute CPUTests.operation(operation)
 
-        actual_flags = registers.flags.slice(*to.keys)
+        actual_flags = cpu.registers.flags.slice(*to.keys)
         @assert.equal! actual_flags,
                        to,
                        "Expected flags with values #{to} after executing #{operation} but " \
