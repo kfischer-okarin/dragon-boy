@@ -1,5 +1,5 @@
 class CPU
-  attr_reader :cycles
+  attr_reader :registers, :memory, :cycles
 
   CYCLES_PER_SECOND = 4_194_304
 
