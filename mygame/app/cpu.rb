@@ -18,6 +18,7 @@ class CPU
   def execute(operation)
     cycles_taken = send("execute_#{operation[:type]}", operation)
     @cycles += cycles_taken
+    cycles_taken
   end
 
   private
