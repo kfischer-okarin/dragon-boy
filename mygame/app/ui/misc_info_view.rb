@@ -19,7 +19,7 @@ module UI
 
       x = @x + 10
       y = top - 10
-      gtk_outputs.primitives << { x: x, y: y, text: "Cycles: #{@game_boy.cpu.cycles}" }.label!
+      gtk_outputs.primitives << { x: x, y: y, text: 'Cycles: %9s' % format_with_1000_separator(@game_boy.cpu.cycles) }.label!
       y -= 20
       gtk_outputs.primitives << { x: x, y: y, text: "FPS: #{$gtk.current_framerate.to_i}" }.label!
 
@@ -30,6 +30,18 @@ module UI
         gtk_outputs.primitives << { x: x, y: y, text: "#{index + 1}) #{debugger_tabs[key]}" }.label!(color)
         y -= 20
       end
+    end
+
+    def format_with_1000_separator(number, separator = ',')
+      result = number.to_s
+      index = -4
+      inserted_commas = 0
+      while index.abs < result.length + inserted_commas
+        result.insert index, separator
+        inserted_commas += 1
+        index -= 4
+      end
+      result
     end
   end
 end
