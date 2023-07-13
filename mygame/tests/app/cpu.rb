@@ -602,7 +602,7 @@ def test_cpu_execute_operation_cp_with_constant(_args, assert)
   end
 end
 
-def test_cpu_execute_next_operation(_args, assert)
+def test_cpu_execute_next_operation_executes_operation_at_pc(_args, assert)
   cpu = CPUTests.build_cpu
   cpu.memory.load_rom "\x00\x00\x02"
   cpu.registers.pc = 0x0002
@@ -615,7 +615,16 @@ def test_cpu_execute_next_operation(_args, assert)
   cpu.execute_next_operation
 
   assert.equal! executed_operation[:opcode], 0x02
-  assert.equal! cpu.registers.pc, 0x0003
+end
+
+def test_cpu_execute_next_operation_executes_advances_pc(_args, assert)
+  cpu = CPUTests.build_cpu
+  cpu.memory.load_rom "\x00\x00\x02"
+  cpu.registers.pc = 0x0002
+
+  cpu.execute_next_operation
+
+  assert.equal! cpu.registers.pc, 0x0003 # See opcodes.json:45
 end
 
 module CPUTests
