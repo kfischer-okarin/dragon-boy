@@ -40,6 +40,7 @@ module UI
     def render_tilemap(gtk_outputs, index, x, top)
       render_target_name = "tilemap#{index}"
       render_target = gtk_outputs[render_target_name]
+      render_target.transient!
       render_target.w = 256
       render_target.h = 256
       render_target.primitives << @vram.tilemap(index).tile_primitives
