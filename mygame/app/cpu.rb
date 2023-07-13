@@ -10,11 +10,12 @@ class CPU
   end
 
   def execute_next_operation
-    execute Operation.parse(@memory, @registers.pc)
+    operation = Operation.parse(@memory, @registers.pc)
+    @registers.pc += operation[:length]
+    execute operation
   end
 
   def execute(operation)
-    @registers.pc += operation[:length]
     cycles_taken = send("execute_#{operation[:type]}", operation)
     @cycles += cycles_taken
   end

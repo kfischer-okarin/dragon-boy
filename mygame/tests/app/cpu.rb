@@ -1,22 +1,3 @@
-def test_cpu_execute_advances_pc_by_operation_length(_args, assert)
-  [
-    CPUTests.operation(type: :NOP, arguments: [], length: 1),
-    CPUTests.operation(type: :LD, arguments: [:A, 0x12], length: 2)
-  ].each do |operation|
-    registers = Registers.new
-    memory = Memory.new
-    cpu = CPU.new registers: registers, memory: memory
-    registers.pc = 0x0123
-
-    cpu.execute operation
-
-    pc_difference = registers.pc - 0x0123
-    assert.equal! pc_difference,
-                  operation[:length],
-                  "Expected PC to be advanced by #{operation[:length]} but was advanced by #{pc_difference}"
-  end
-end
-
 def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
   [
     CPUTests.operation(type: :NOP, arguments: [], cycles: 16),
@@ -330,25 +311,25 @@ def test_cpu_execute_operation_jr(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :JR, arguments: [-13], length: 2)
+  operation = CPUTests.operation(type: :JR, arguments: [-13])
   registers.pc = 0x0120
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120 + 2 - 13
+  assert.equal! registers.pc, 0x0120 - 13
 end
 
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 48, untaken: 32 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
   registers.pc = 0x0120
   registers.flag_z = 0
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120 + 2 - 12
+  assert.equal! registers.pc, 0x0120 - 12
   assert.equal! cpu.cycles, 48
 end
 
@@ -356,13 +337,13 @@ def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], length: 2, cycles: { taken: 48, untaken: 32 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
   registers.pc = 0x0120
   registers.flag_z = 1
 
   cpu.execute operation
 
-  assert.equal! registers.pc, 0x0120 + 2
+  assert.equal! registers.pc, 0x0120
   assert.equal! cpu.cycles, 32
 end
 
@@ -378,7 +359,7 @@ def test_cpu_execute_operation_call(_args, assert)
   registers = Registers.new
   memory = Memory.new
   cpu = CPU.new registers: registers, memory: memory
-  operation = CPUTests.operation(type: :CALL, arguments: [0x0095], length: 3)
+  operation = CPUTests.operation(type: :CALL, arguments: [0x0095])
   registers.pc = 0x0120
   registers.sp = 0xFFFE
 
@@ -386,7 +367,7 @@ def test_cpu_execute_operation_call(_args, assert)
 
   assert.equal! registers.pc, 0x0095
   assert.equal! registers.sp, 0xFFFC
-  assert.equal! memory[0xFFFC], 0x23
+  assert.equal! memory[0xFFFC], 0x20
   assert.equal! memory[0xFFFD], 0x01
 end
 
@@ -682,6 +663,7 @@ def test_cpu_execute_next_operation(_args, assert)
   cpu.execute_next_operation
 
   assert.equal! executed_operation[:opcode], 0x02
+  assert.equal! registers.pc, 0x0003
 end
 
 module CPUTests
