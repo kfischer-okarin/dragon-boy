@@ -1,5 +1,5 @@
 class GameBoy
-  attr_reader :rom, :boot_rom, :registers, :memory, :cpu, :io, :vram
+  attr_reader :rom, :boot_rom, :registers, :memory, :cpu, :io, :vram, :clock
 
   def initialize(rom, boot_rom: nil)
     @rom = rom
@@ -9,6 +9,7 @@ class GameBoy
     @cpu = CPU.new registers: @registers, memory: @memory
     @io = GameBoyIO.new
     @vram = VRAM.new
+    @clock = Clock.new cpu: @cpu
 
     @memory.load_rom $gtk.read_file("roms/#{@rom}")
     @memory.load_boot_rom $gtk.read_file(@boot_rom) if @boot_rom

@@ -83,7 +83,8 @@ module Screens
       game_boy = @state.game_boy
 
       @state.operations_to_execute.times do
-        game_boy.cpu.execute_next_operation
+        pc_before = game_boy.registers.pc
+        game_boy.clock.advance until game_boy.registers.pc != pc_before
         if @program_view.breakpoints.key? game_boy.registers.pc
           @state.running = false
           break
