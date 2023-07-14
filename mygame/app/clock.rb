@@ -17,6 +17,8 @@ class Clock
   end
 
   def advance
+    return if @schedule.empty?
+
     next_cycle_with_method = @schedule.first[:cycle]
     while @schedule.first[:cycle] == next_cycle_with_method
       method = @schedule.shift[:method]

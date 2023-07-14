@@ -60,3 +60,12 @@ def test_clock_advance_removes_executed_methods_from_schedule(_args, assert)
 
   assert.equal! clock.schedule, [{ cycle: 15, method: :bar }]
 end
+
+def test_clock_advance_does_nothing_when_schedule_is_empty(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  clock.clear_schedule
+
+  clock.advance
+
+  assert.ok!
+end
