@@ -1,10 +1,11 @@
 class Clock
-  attr_reader :schedule
+  attr_reader :schedule, :cycle
 
   def initialize(cpu:)
     @schedule = [
       { cycle: 0, method: :execute_next_operation }
     ]
+    @cycle = 0
   end
 
   def schedule_method(cycle, method)
@@ -20,6 +21,7 @@ class Clock
     return if @schedule.empty?
 
     next_cycle_with_method = @schedule.first[:cycle]
+    @cycle = next_cycle_with_method
     while @schedule.first[:cycle] == next_cycle_with_method
       method = @schedule.shift[:method]
       send method

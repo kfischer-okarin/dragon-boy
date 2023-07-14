@@ -80,3 +80,14 @@ def test_clock_advance_can_process_the_last_schedule_item(_args, assert)
 
   assert.equal! clock.schedule, []
 end
+
+def test_clock_advance_updates_cycle(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  clock.define_singleton_method :foo do; end
+  clock.clear_schedule
+  clock.schedule_method 12, :foo
+
+  clock.advance
+
+  assert.equal! clock.cycle, 12
+end
