@@ -44,5 +44,13 @@ module GTK
 
       @assertion_performed = true
     end
+
+    def contains!(collection, item, message = nil)
+      if !collection.include?(item)
+        raise "Expected\n#{$fn.pretty_format(collection)}\n\nto contain:\n\n#{item}.\n#{message}"
+      end
+
+      @assertion_performed = true
+    end
   end
 end
