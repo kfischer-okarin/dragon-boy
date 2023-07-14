@@ -17,6 +17,12 @@ class Clock
     @schedule = []
   end
 
+  def advance_to_cycle(cycle)
+    advance while @schedule.any? && @schedule.first[:cycle] <= cycle
+
+    @cycle = cycle
+  end
+
   def advance
     return if @schedule.empty?
 
