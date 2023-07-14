@@ -15,5 +15,13 @@ class Clock
   def clear_schedule
     @schedule = []
   end
+
+  def advance
+    next_cycle_with_method = @schedule.first[:cycle]
+    while @schedule.first[:cycle] == next_cycle_with_method
+      method = @schedule.shift[:method]
+      send method
+    end
+  end
 end
 
