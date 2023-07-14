@@ -137,6 +137,21 @@ def test_clock_advance_to_cycle_advance_to_past_cycle_must_go_to_the_end_first(_
   assert.equal! method_calls, [:foo, :bar]
 end
 
+def test_clock_execute_next_operation(_args, assert)
+  cpu = Object.new
+  cpu_called = false
+  cpu.define_singleton_method :execute_next_operation do
+    cpu_called = true
+    32
+  end
+  clock = Clock.new cpu: cpu
+
+  clock.execute_next_operation
+
+  assert.true! cpu_called
+  assert.contains! clock.schedule, { cycle: 32, method: :execute_next_operation }
+end
+
 def listen_for_method_calls(object, methods)
   calls = []
   methods.each do |method|

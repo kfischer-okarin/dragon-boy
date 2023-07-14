@@ -4,6 +4,7 @@ class Clock
   CYCLES_PER_SECOND = 4_194_304
 
   def initialize(cpu:)
+    @cpu = cpu
     @schedule = [
       { cycle: 0, method: :execute_next_operation }
     ]
@@ -34,6 +35,11 @@ class Clock
       method = @schedule.shift[:method]
       send method
     end
+  end
+
+  def execute_next_operation
+    cycles_taken = @cpu.execute_next_operation
+    schedule_method @cycle + cycles_taken, :execute_next_operation
   end
 
   private
