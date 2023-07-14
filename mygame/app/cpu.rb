@@ -1,12 +1,9 @@
 class CPU
-  attr_reader :registers, :memory, :cycles
-
-  CYCLES_PER_SECOND = 4_194_304
+  attr_reader :registers, :memory
 
   def initialize(registers:, memory:)
     @registers = registers
     @memory = memory
-    @cycles = 0
   end
 
   def execute_next_operation
@@ -16,9 +13,7 @@ class CPU
   end
 
   def execute(operation)
-    cycles_taken = send("execute_#{operation[:type]}", operation)
-    @cycles += cycles_taken
-    cycles_taken
+    send("execute_#{operation[:type]}", operation)
   end
 
   private

@@ -1,20 +1,5 @@
 require 'tests/test_helper.rb'
 
-def test_cpu_execute_advances_cycles_by_operation_cycles(_args, assert)
-  [
-    CPUTests.operation(type: :NOP, arguments: [], cycles: 16),
-    CPUTests.operation(type: :LD, arguments: [:A, 0x12], cycles: 32)
-  ].each do |operation|
-    cpu = build_cpu
-
-    cpu.execute operation
-
-    assert.equal! cpu.cycles,
-                  operation[:cycles],
-                  "Expected cycles to be advanced by #{operation[:cycles]} but was advanced by #{cpu.cycles}"
-  end
-end
-
 def test_cpu_execute_operation_nop(_args, assert)
   cpu = build_cpu
   operation = CPUTests.operation(type: :NOP, arguments: [])
@@ -299,10 +284,10 @@ def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   cpu.registers.pc = 0x0120
   cpu.registers.flag_z = 0
 
-  cpu.execute operation
+  cycles_taken = cpu.execute operation
 
   assert.equal! cpu.registers.pc, 0x0120 - 12
-  assert.equal! cpu.cycles, 48
+  assert.equal! cycles_taken, 48
 end
 
 def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
@@ -311,10 +296,10 @@ def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
   cpu.registers.pc = 0x0120
   cpu.registers.flag_z = 1
 
-  cpu.execute operation
+  cycles_taken = cpu.execute operation
 
   assert.equal! cpu.registers.pc, 0x0120
-  assert.equal! cpu.cycles, 32
+  assert.equal! cycles_taken, 32
 end
 
 def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
