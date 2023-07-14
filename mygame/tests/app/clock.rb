@@ -69,3 +69,14 @@ def test_clock_advance_does_nothing_when_schedule_is_empty(_args, assert)
 
   assert.ok!
 end
+
+def test_clock_advance_can_process_the_last_schedule_item(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  clock.define_singleton_method :foo do; end
+  clock.clear_schedule
+  clock.schedule_method 12, :foo
+
+  clock.advance
+
+  assert.equal! clock.schedule, []
+end

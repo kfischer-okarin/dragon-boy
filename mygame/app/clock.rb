@@ -23,6 +23,8 @@ class Clock
     while @schedule.first[:cycle] == next_cycle_with_method
       method = @schedule.shift[:method]
       send method
+
+      break if @schedule.empty?
     end
   end
 end
