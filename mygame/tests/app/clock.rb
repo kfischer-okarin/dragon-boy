@@ -20,3 +20,13 @@ def test_clock_schedule_method_adds_method_at_the_right_point_in_schedule(_args,
     { cycle: 10, method: :foo }
   ]
 end
+
+def test_clock_clear_schedule(_args, assert)
+  clock = Clock.new cpu: build_cpu
+
+  clock.schedule_method 10, :foo
+  clock.schedule_method 5, :bar
+  clock.clear_schedule
+
+  assert.equal! clock.schedule, []
+end

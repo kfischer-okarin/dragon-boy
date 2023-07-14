@@ -11,5 +11,9 @@ class Clock
     @schedule << { cycle: cycle, method: method }
     @schedule.sort! { |item1, item2| item1[:cycle] <=> item2[:cycle] }
   end
+
+  def clear_schedule
+    @schedule = []
+  end
 end
 
