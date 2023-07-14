@@ -33,12 +33,7 @@ end
 
 def test_clock_advance_executes_all_methods_scheduled_next(_args, assert)
   clock = Clock.new cpu: build_cpu
-  executed = []
-  [:foo, :bar].each do |method|
-    clock.define_singleton_method method do
-      executed << method
-    end
-  end
+  method_calls = listen_for_method_calls clock, [:foo, :bar]
   clock.clear_schedule
   clock.schedule_method 12, :foo
   clock.schedule_method 12, :bar
@@ -46,7 +41,7 @@ def test_clock_advance_executes_all_methods_scheduled_next(_args, assert)
 
   clock.advance
 
-  assert.equal! executed, [:foo, :bar]
+  assert.equal! method_calls, [:foo, :bar]
 end
 
 def test_clock_advance_removes_executed_methods_from_schedule(_args, assert)
@@ -103,12 +98,7 @@ end
 
 def test_clock_advance_to_cycle_executes_all_methods_scheduled_until_that_cycle(_args, assert)
   clock = Clock.new cpu: build_cpu
-  executed = []
-  [:foo, :bar].each do |method|
-    clock.define_singleton_method method do
-      executed << method
-    end
-  end
+  method_calls = listen_for_method_calls clock, [:foo, :bar]
   clock.clear_schedule
   clock.schedule_method 12, :foo
   clock.schedule_method 13, :bar
@@ -116,7 +106,7 @@ def test_clock_advance_to_cycle_executes_all_methods_scheduled_until_that_cycle(
 
   clock.advance_to_cycle 14
 
-  assert.equal! executed, [:foo, :bar]
+  assert.equal! method_calls, [:foo, :bar]
   assert.equal! clock.cycle, 14
 end
 
@@ -131,4 +121,14 @@ def test_clock_schedule_method_should_schedule_past_items_after_4mhz(_args, asse
     { cycle: 4_194_303, method: :foo },
     { cycle: 1000, method: :bar }
   ]
+end
+
+def listen_for_method_calls(object, methods)
+  calls = []
+  methods.each do |method|
+    object.define_singleton_method method do
+      calls << method
+    end
+  end
+  calls
 end
