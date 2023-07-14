@@ -123,6 +123,20 @@ def test_clock_schedule_method_should_schedule_past_items_after_4mhz(_args, asse
   ]
 end
 
+def test_clock_advance_to_cycle_advance_to_past_cycle_must_go_to_the_end_first(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  method_calls = listen_for_method_calls clock, [:foo, :bar]
+  clock.clear_schedule
+  clock.advance_to_cycle 2000
+  clock.schedule_method 4_194_303, :foo
+  clock.schedule_method 1000, :bar
+  clock.schedule_method 1500, :explode
+
+  clock.advance_to_cycle 1200
+
+  assert.equal! method_calls, [:foo, :bar]
+end
+
 def listen_for_method_calls(object, methods)
   calls = []
   methods.each do |method|

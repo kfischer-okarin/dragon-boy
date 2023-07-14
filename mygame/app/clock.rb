@@ -20,7 +20,7 @@ class Clock
   end
 
   def advance_to_cycle(cycle)
-    advance while @schedule.any? && @schedule.first[:cycle] <= cycle
+    advance while @schedule.any? && @schedule.first[:cycle] <= effective_cycle(cycle)
 
     @cycle = cycle
   end
