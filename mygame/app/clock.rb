@@ -12,11 +12,7 @@ class Clock
 
   def schedule_method(cycle, method)
     @schedule << { cycle: cycle, method: method }
-    @schedule = @schedule.sort_by { |item|
-      cycle = item[:cycle]
-      cycle += CYCLES_PER_SECOND if cycle < @cycle
-      cycle
-    }
+    @schedule = @schedule.sort_by { |item| effective_cycle(item[:cycle]) }
   end
 
   def clear_schedule
@@ -37,6 +33,16 @@ class Clock
     while @schedule.any? && @schedule.first[:cycle] == next_cycle_with_method
       method = @schedule.shift[:method]
       send method
+    end
+  end
+
+  private
+
+  def effective_cycle(cycle)
+    if cycle < @cycle
+      cycle + CYCLES_PER_SECOND
+    else
+      cycle
     end
   end
 end
