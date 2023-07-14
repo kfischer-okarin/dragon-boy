@@ -48,3 +48,15 @@ def test_clock_advance_executes_all_methods_scheduled_next(_args, assert)
 
   assert.equal! executed, [:foo, :bar]
 end
+
+def test_clock_advance_removes_executed_methods_from_schedule(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  clock.define_singleton_method :foo do; end
+  clock.clear_schedule
+  clock.schedule_method 12, :foo
+  clock.schedule_method 15, :bar
+
+  clock.advance
+
+  assert.equal! clock.schedule, [{ cycle: 15, method: :bar }]
+end
