@@ -1,6 +1,8 @@
 class Clock
   attr_reader :schedule, :cycle
 
+  CYCLES_PER_SECOND = 4_194_304
+
   def initialize(cpu:)
     @schedule = [
       { cycle: 0, method: :execute_next_operation }
@@ -10,7 +12,11 @@ class Clock
 
   def schedule_method(cycle, method)
     @schedule << { cycle: cycle, method: method }
-    @schedule.sort! { |item1, item2| item1[:cycle] <=> item2[:cycle] }
+    @schedule = @schedule.sort_by { |item|
+      cycle = item[:cycle]
+      cycle += CYCLES_PER_SECOND if cycle < @cycle
+      cycle
+    }
   end
 
   def clear_schedule

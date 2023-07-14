@@ -119,3 +119,16 @@ def test_clock_advance_to_cycle_executes_all_methods_scheduled_until_that_cycle(
   assert.equal! executed, [:foo, :bar]
   assert.equal! clock.cycle, 14
 end
+
+def test_clock_schedule_method_should_schedule_past_items_after_4mhz(_args, assert)
+  clock = Clock.new cpu: build_cpu
+  clock.clear_schedule
+  clock.advance_to_cycle 2000
+  clock.schedule_method 4_194_303, :foo
+  clock.schedule_method 1000, :bar
+
+  assert.equal! clock.schedule, [
+    { cycle: 4_194_303, method: :foo },
+    { cycle: 1000, method: :bar }
+  ]
+end
