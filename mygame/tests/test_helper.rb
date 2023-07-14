@@ -10,7 +10,7 @@ module GTK
         end
 
         if !exception_raised
-          raise "Expected exception to be raised but no exception was raised. #{exception_class_or_message}."
+          raise "Expected exception to be raised but no exception was raised.\n#{exception_class_or_message}"
         end
       else
         raised_exception_class = nil
@@ -21,9 +21,9 @@ module GTK
         end
 
         if raised_exception_class.nil?
-          raise "Expected exception #{exception_class} to be raised but no exception was raised. #{message}."
+          raise "Expected exception #{exception_class} to be raised but no exception was raised.\n#{message}"
         elsif !raised_exception_class.ancestors.include?(exception_class)
-          raise "Expected exception #{exception_class} to be raised but #{raised_exception_class} was raised. #{message}."
+          raise "Expected exception #{exception_class} to be raised but #{raised_exception_class} was raised.\n#{message}"
         end
       end
 
