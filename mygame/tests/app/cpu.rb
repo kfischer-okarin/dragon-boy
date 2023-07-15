@@ -623,6 +623,18 @@ def test_cpu_execute_next_operation_returns_cycles_taken(_args, assert)
   assert.equal! cpu.execute_next_operation, 16 # See opcodes.json:7 (multiply by 4)
 end
 
+def test_cpu_next_operation(_args, assert)
+  cpu = build_cpu
+  cpu.memory.load_rom "\x00\x02"
+  cpu.registers.pc = 0x0000
+
+  assert.equal! cpu.next_operation[:opcode], 0x00
+
+  cpu.execute_next_operation
+
+  assert.equal! cpu.next_operation[:opcode], 0x02
+end
+
 module CPUTests
   class << self
     def operation(operation)

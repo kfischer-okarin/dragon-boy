@@ -7,9 +7,14 @@ class CPU
   end
 
   def execute_next_operation
-    operation = Operation.parse(@memory, @registers.pc)
+    operation = next_operation
     @registers.pc += operation[:length]
+    @next_operation = nil
     execute operation
+  end
+
+  def next_operation
+    @next_operation ||= Operation.parse(@memory, @registers.pc)
   end
 
   def execute(operation)
