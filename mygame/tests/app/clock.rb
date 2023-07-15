@@ -1,9 +1,13 @@
 require 'tests/test_helper.rb'
 
-def test_clock_new_clock_has_cpu_scheduled_on_cycle0(_args, assert)
-  clock = Clock.new cpu: build_cpu
+def test_clock_new_clock_has_cpu_scheduled_at_end_of_first_operation(_args, assert)
+  cpu = Object.new
+  cpu.define_singleton_method :next_operation_duration do
+    48
+  end
+  clock = Clock.new cpu: cpu
 
-  assert.contains! clock.schedule, { cycle: 0, method: :execute_next_operation }
+  assert.contains! clock.schedule, { cycle: 48, method: :execute_next_operation }
 end
 
 def test_clock_schedule_method_adds_method_at_the_right_point_in_schedule(_args, assert)
