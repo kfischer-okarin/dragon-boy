@@ -280,32 +280,30 @@ end
 
 def test_cpu_execute_operation_jr_with_condition_fulfilled(_args, assert)
   cpu = build_cpu
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12])
   cpu.registers.pc = 0x0120
   cpu.registers.flag_z = 0
 
-  cycles_taken = cpu.execute operation
+  cpu.execute operation
 
   assert.equal! cpu.registers.pc, 0x0120 - 12
-  assert.equal! cycles_taken, 48
 end
 
 def test_cpu_execute_operation_jr_with_condition_not_fulfilled(_args, assert)
   cpu = build_cpu
-  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 })
+  operation = CPUTests.operation(type: :JR, arguments: [:NZ, -12])
   cpu.registers.pc = 0x0120
   cpu.registers.flag_z = 1
 
-  cycles_taken = cpu.execute operation
+  cpu.execute operation
 
   assert.equal! cpu.registers.pc, 0x0120
-  assert.equal! cycles_taken, 32
 end
 
 def test_cpu_execute_operation_jr_with_condition_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_not_change_any_flags(
-      { type: :JR, arguments: [:NZ, -12], cycles: { taken: 48, untaken: 32 } },
+      { type: :JR, arguments: [:NZ, -12] }
     )
   end
 end
@@ -614,15 +612,6 @@ def test_cpu_execute_next_operation_executes_advances_pc(_args, assert)
   assert.equal! cpu.registers.pc, 0x0003 # See opcodes.json:45
 end
 
-def test_cpu_execute_next_operation_returns_cycles_taken(_args, assert)
-  cpu = build_cpu
-  cpu.memory.load_rom "\x00\x00"
-  cpu.registers.pc = 0x0000
-
-  assert.equal! cpu.execute_next_operation, 16 # See opcodes.json:7 (multiply by 4)
-  assert.equal! cpu.execute_next_operation, 16 # See opcodes.json:7 (multiply by 4)
-end
-
 def test_cpu_next_operation(_args, assert)
   cpu = build_cpu
   cpu.memory.load_rom "\x00\x02"
@@ -663,7 +652,7 @@ module CPUTests
   class << self
     def operation(operation)
       # Add some defaults so that execute doesn't fail
-      { length: 1, cycles: 16, opcode: 0x00 }.merge operation
+      { length: 1, opcode: 0x00 }.merge operation
     end
 
     def test_flags(assert, &block)

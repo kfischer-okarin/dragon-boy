@@ -37,7 +37,7 @@ class CPU
   private
 
   def execute_NOP(operation)
-    operation[:cycles]
+    # Do nothing
   end
 
   def execute_LD(operation)
@@ -53,7 +53,6 @@ class CPU
     else
       @registers.send "#{target.downcase}=", value
     end
-    operation[:cycles]
   end
 
   def execute_LDH(operation)
@@ -63,19 +62,16 @@ class CPU
       address = 0xFF00 + target.address
       @memory[address] = @registers.a
     end
-    operation[:cycles]
   end
 
   def execute_LDI(operation)
     @memory[@registers.hl] = @registers.a
     @registers.hl += 1
-    operation[:cycles]
   end
 
   def execute_LDD(operation)
     @memory[@registers.hl] = @registers.a
     @registers.hl -= 1
-    operation[:cycles]
   end
 
   def execute_INC(operation)
@@ -92,7 +88,6 @@ class CPU
     end
 
     @registers.send "#{register}=", result
-    operation[:cycles]
   end
 
   def execute_DEC(operation)
@@ -104,44 +99,33 @@ class CPU
     @registers.flag_n = 1
     assign_flag_z result
     assign_flag_h old_value, result
-    operation[:cycles]
   end
 
   def execute_CALL(operation)
     push_16bit_value @registers.pc
     @registers.pc = operation[:arguments][0]
-    operation[:cycles]
   end
 
   def execute_RET(operation)
     @registers.pc = pop_16bit_value
-    operation[:cycles]
   end
 
   def execute_PUSH(operation)
     push_16bit_value @registers.send(operation[:arguments][0].downcase)
-    operation[:cycles]
   end
 
   def execute_POP(operation)
     value = pop_16bit_value
     @registers.send "#{operation[:arguments][0].downcase}=", value
-    operation[:cycles]
   end
 
   def execute_JR(operation)
     arguments = operation[:arguments]
     case arguments[0]
     when Symbol
-      if condition_fulfilled? arguments[0]
-        @registers.pc += arguments[1]
-        operation[:cycles][:taken]
-      else
-        operation[:cycles][:untaken]
-      end
+      @registers.pc += arguments[1] if condition_fulfilled? arguments[0]
     else
       @registers.pc += arguments[0]
-      operation[:cycles]
     end
   end
 
@@ -151,12 +135,10 @@ class CPU
     @registers.flag_n = 0
     @registers.flag_c = 0
     @registers.flag_h = 0
-    operation[:cycles]
   end
 
   def execute_RLA(operation)
     execute_RL operation.merge(arguments: [:A])
-    operation[:cycles]
   end
 
   def execute_RL(operation)
@@ -168,7 +150,6 @@ class CPU
     @registers.flag_n = 0
     assign_flag_c value, result
     @registers.flag_h = 0
-    operation[:cycles]
   end
 
   def execute_BIT(operation)
@@ -178,7 +159,6 @@ class CPU
     assign_flag_z result
     @registers.flag_n = 0
     @registers.flag_h = 1
-    operation[:cycles]
   end
 
   def execute_CP(operation)
@@ -189,7 +169,6 @@ class CPU
     @registers.flag_n = 1
     assign_flag_c @registers.a, difference
     assign_flag_h @registers.a, difference
-    operation[:cycles]
   end
 
   def condition_fulfilled?(condition)
