@@ -456,6 +456,18 @@ def test_cpu_execute_operation_rl_on_register(_args, assert)
   assert.equal! cpu.registers.flag_c, 1
 end
 
+def test_cpu_execute_operation_rl_on_ff(_args, assert)
+  cpu = build_cpu
+  operation = CPUTests.operation(type: :RL, arguments: [:C])
+  cpu.registers.c = 0b11111111
+  cpu.registers.flag_c = 1
+
+  cpu.execute operation
+
+  assert.equal! cpu.registers.c, 0b11111111
+  assert.equal! cpu.registers.flag_c, 1
+end
+
 def test_cpu_execute_operation_rl_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_set_flags(
@@ -486,6 +498,18 @@ def test_cpu_execute_operation_rla(_args, assert)
   cpu.execute operation
 
   assert.equal! cpu.registers.a, 0b01101001
+  assert.equal! cpu.registers.flag_c, 1
+end
+
+def test_cpu_execute_operation_rla_on_ff(_args, assert)
+  cpu = build_cpu
+  operation = CPUTests.operation(type: :RLA, arguments: [])
+  cpu.registers.a = 0b11111111
+  cpu.registers.flag_c = 1
+
+  cpu.execute operation
+
+  assert.equal! cpu.registers.a, 0b11111111
   assert.equal! cpu.registers.flag_c, 1
 end
 

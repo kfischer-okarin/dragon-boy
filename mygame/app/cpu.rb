@@ -149,7 +149,7 @@ class CPU
     @registers.send("#{register}=", result)
     assign_flag_z result
     @registers.flag_n = 0
-    assign_flag_c value, result
+    @registers.flag_c = value >> 7
     @registers.flag_h = 0
   end
 
