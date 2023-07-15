@@ -5,9 +5,7 @@ class Clock
 
   def initialize(cpu:)
     @cpu = cpu
-    @schedule = [
-      { cycle: @cpu.next_operation_duration, method: :execute_next_operation }
-    ]
+    @schedule = []
     @cycle = 0
   end
 
@@ -35,6 +33,10 @@ class Clock
       method = @schedule.shift[:method]
       send method
     end
+  end
+
+  def schedule_next_cpu_operation
+    schedule_method @cycle + @cpu.next_operation_duration, :execute_next_operation
   end
 
   def execute_next_operation
