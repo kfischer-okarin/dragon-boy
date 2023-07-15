@@ -13,6 +13,19 @@ class CPU
     execute operation
   end
 
+  def next_operation_duration
+    case next_operation[:type]
+    when :JR, :JP, :CALL, :RET
+      if condition_fulfilled? next_operation[:arguments][0]
+        next_operation[:cycles][:taken]
+      else
+        next_operation[:cycles][:untaken]
+      end
+    else
+      next_operation[:cycles]
+    end
+  end
+
   def next_operation
     @next_operation ||= Operation.parse(@memory, @registers.pc)
   end
