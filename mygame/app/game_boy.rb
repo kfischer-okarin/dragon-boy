@@ -16,6 +16,8 @@ class GameBoy
     @memory.connect_io @io
     @memory.connect_vram @vram
 
+    @clock.schedule_next_cpu_operation
+
     setup_memory unless boot_rom
   end
 
