@@ -14,15 +14,16 @@ class CPU
   end
 
   def next_operation_duration
-    case next_operation[:type]
-    when :JR, :JP, :CALL, :RET
+    cycles = next_operation[:cycles]
+    case cycles
+    when Hash
       if condition_fulfilled? next_operation[:arguments][0]
-        next_operation[:cycles][:taken]
+        cycles[:taken]
       else
-        next_operation[:cycles][:untaken]
+        cycles[:untaken]
       end
     else
-      next_operation[:cycles]
+      cycles
     end
   end
 

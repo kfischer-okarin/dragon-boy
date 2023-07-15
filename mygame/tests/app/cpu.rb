@@ -648,6 +648,18 @@ def test_cpu_next_operation_duration_conditional_jump(_args, assert)
     assert.equal! cpu.next_operation_duration, 8
   end
 end
+
+def test_cpu_next_operation_duration_unconditional_jump(_args, assert)
+  cpu = build_cpu
+  [:JR, :JP, :CALL, :RET].each do |type|
+    cpu.define_singleton_method :next_operation do
+      { type: type, arguments: [], cycles: 20 }
+    end
+
+    assert.equal! cpu.next_operation_duration, 20
+  end
+end
+
 module CPUTests
   class << self
     def operation(operation)
