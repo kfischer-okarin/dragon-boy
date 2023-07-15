@@ -40,9 +40,8 @@ class Clock
   end
 
   def execute_next_operation
-    duration = @cpu.next_operation_duration
     @cpu.execute_next_operation
-    schedule_method @cycle + duration, :execute_next_operation
+    schedule_next_cpu_operation
   end
 
   private

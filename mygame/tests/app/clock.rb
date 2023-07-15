@@ -145,7 +145,7 @@ def test_clock_execute_next_operation(_args, assert)
     cpu_called = true
   end
   cpu.define_singleton_method :next_operation_duration do
-    32
+    cpu_called ? 32 : 16
   end
   clock = Clock.new cpu: cpu
 
