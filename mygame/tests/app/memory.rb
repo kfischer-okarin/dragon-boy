@@ -1,3 +1,9 @@
+def test_memory_contains_ff_in_rom_memory_area_without_any_roms(_args, assert)
+  memory = Memory.new
+
+  assert.equal! memory[0x0000..0x07FF], [0xFF] * 0x0800
+end
+
 def test_memory_loads_boot_rom_at_0x0000_to_0x00FF_if_specified(_args, assert)
   memory = Memory.new
 

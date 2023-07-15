@@ -3,6 +3,7 @@ class Memory
     @rom = nil
     @boot_rom = nil
     @content = Array.new(length)
+    @content.fill 0xFF, 0, 0x8000
     @io = nil
     @vram = nil
   end
