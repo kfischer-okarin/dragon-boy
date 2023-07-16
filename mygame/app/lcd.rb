@@ -28,6 +28,17 @@ class LCD
     @values[0xFF44] = value
   end
 
+  def current_mode_duration
+    MODE_DURATION[mode]
+  end
+
+  MODE_DURATION = {
+    oam_scan: 80,
+    pixel_transfer: 172,
+    hblank: 204,
+    vblank: 456
+  }.freeze
+
   def advance_scanline
     case @mode
     when :oam_scan

@@ -30,6 +30,21 @@ end
   end
 end
 
+[
+  { mode: :oam_scan, scanline: 0, expected_duration: 80 },
+  { mode: :pixel_transfer, scanline: 0, expected_duration: 172 },
+  { mode: :hblank, scanline: 0, expected_duration: 204 },
+  { mode: :vblank, scanline: 144, expected_duration: 456 }
+].each do |test_case|
+  define_method "test_lcd_current_mode_duration_#{test_case[:mode]}_#{test_case[:scanline]}" do |_args, assert|
+    lcd = build_lcd
+    lcd.mode = test_case[:mode]
+    lcd.scanline = test_case[:scanline]
+
+    assert.equal! lcd.current_mode_duration, test_case[:expected_duration]
+  end
+end
+
 def test_lcd_setting_scanline_updates_ff44(_args, assert)
   lcd = build_lcd
 
