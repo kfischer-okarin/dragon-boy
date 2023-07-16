@@ -8,6 +8,10 @@ def build_clock(cpu: nil)
   Clock.new cpu: cpu || build_cpu
 end
 
+def build_lcd
+  LCD.new
+end
+
 def listen_for_method_calls(object, methods)
   calls = []
   methods.each do |method|
