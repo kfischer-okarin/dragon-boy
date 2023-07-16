@@ -6,6 +6,7 @@ class Memory
     @content.fill 0xFF, 0, 0x8000
     @io = nil
     @vram = nil
+    @lcd
   end
 
   def load_rom(rom)
@@ -24,6 +25,10 @@ class Memory
 
   def connect_vram(vram)
     @vram = vram
+  end
+
+  def connect_lcd(lcd)
+    @lcd = lcd
   end
 
   def [](address)
@@ -48,6 +53,8 @@ class Memory
     case address
     when 0xFF47, 0x8000..0x9FFF
       @vram || @content
+    when 0xFF44
+      @lcd || @content
     when 0xFF00..0xFF7F
       @io || @content
     else

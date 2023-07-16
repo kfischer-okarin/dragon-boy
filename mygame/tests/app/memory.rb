@@ -97,3 +97,24 @@ def test_memory_forward_palette_setting_to_vram(_args, assert)
 
   assert.equal! vram[0xFF47], 0xBB
 end
+
+def test_memory_lcd_status_register(_args, assert)
+  memory = Memory.new
+  lcd = { 0xFF44 => 22 } # Anything with #[] and #[]= will do
+
+  memory.connect_lcd lcd
+
+  assert.equal! memory[0xFF44], 22
+
+  memory[0xFF44] = 24
+
+  assert.equal! memory[0xFF44], 24
+end
+
+def test_memory_access_lcd_without_connected_lcd(_args, assert)
+  memory = Memory.new
+
+  memory[0xFF44] = 0xBB
+
+  assert.equal! memory[0xFF44], 0xBB
+end
