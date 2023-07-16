@@ -17,6 +17,7 @@ class GameBoy
     @memory.connect_io @io
     @memory.connect_vram @vram
     @memory.connect_lcd @lcd
+    $m = @memory unless $gtk.production?
 
     @clock.schedule_next_cpu_operation
     @clock.schedule_next_lcd_scanline
