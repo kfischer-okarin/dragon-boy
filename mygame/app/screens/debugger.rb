@@ -60,15 +60,11 @@ module Screens
     def process_inputs(args)
       key_down = args.inputs.keyboard.key_down
 
-      @state.operations_to_execute = 0
+      @state.next_operation = false
       if @state.running
-        if key_down.enter
-          @state.running = false
-        else
-          @state.operations_to_execute = 1000
-        end
+        @state.running = false if key_down.enter
       else
-        @state.operations_to_execute = 1 if key_down.space
+        @state.next_operation = true if key_down.space
         @state.running = true if key_down.enter
       end
 
@@ -86,12 +82,38 @@ module Screens
     end
 
     def update_game_boy
-      game_boy = @state.game_boy
+      clock = @state.game_boy.clock
+      registers = @state.game_boy.registers
 
-      @state.operations_to_execute.times do
-        pc_before = game_boy.registers.pc
-        game_boy.clock.advance until game_boy.registers.pc != pc_before
-        if @program_view.breakpoints.key? game_boy.registers.pc
+      if @state.running
+        run_until_breakpoint
+      elsif @state.next_operation
+        pc_before = registers.pc
+        clock.advance until registers.pc != pc_before
+      end
+    end
+
+    def run_until_breakpoint
+      clock = @state.game_boy.clock
+      registers = @state.game_boy.registers
+      start_cycle = clock.cycle
+      target_cycle = (clock.cycle + 70_224) % Clock::CYCLES_PER_SECOND
+      breakpoints = @program_view.breakpoints
+
+      if target_cycle < clock.cycle
+        until clock.cycle < start_cycle # run until we loop around
+          clock.advance
+          if breakpoints.key? registers.pc
+            @state.running = false
+            break
+          end
+        end
+      end
+      return unless @state.running
+
+      until clock.cycle >= target_cycle
+        clock.advance
+        if breakpoints.key? registers.pc
           @state.running = false
           break
         end
