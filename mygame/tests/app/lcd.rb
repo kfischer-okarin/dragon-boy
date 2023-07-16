@@ -37,3 +37,13 @@ def test_lcd_setting_scanline_updates_ff44(_args, assert)
 
   assert.equal! lcd[0xFF44], 42
 end
+
+def test_lcd_readonly_registers(_args, assert)
+  lcd = build_lcd
+
+  [0xFF44].each do |address|
+    lcd[address] = 0xAA
+
+    assert.not_equal! lcd[address], 0xAA
+  end
+end

@@ -11,6 +11,15 @@ class LCD
     @values[address]
   end
 
+  def []=(address, value)
+    case address
+    when 0xFF44
+      # Read-only
+    else
+      raise 'Illegal LCD address: %04X' % address
+    end
+  end
+
   def scanline
     @values[0xFF44]
   end
