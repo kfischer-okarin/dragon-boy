@@ -4,7 +4,9 @@ class LCD
   def initialize
     @values = {
       0xFF42 => 0,
-      0xFF43 => 0,
+      # [SCX] This initial value is not documented, but it's required to get a properly
+      # scrolling Nintendo logo since the boot ROM only sets SCY
+      0xFF43 => 0
     }
     @mode = :oam_scan
     self.scanline = 0
