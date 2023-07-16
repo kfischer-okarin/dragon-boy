@@ -62,6 +62,8 @@ class CPU
     when Operation::Pointer
       address = 0xFF00 + target.address
       @memory[address] = @registers.a
+    when Symbol
+      @registers.a = @memory[0xFF00 + operation[:arguments][1].address]
     end
   end
 

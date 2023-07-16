@@ -86,6 +86,16 @@ def test_cpu_execute_operation_ldh_A_into_0xFF00_pointer(_args, assert)
   assert.equal! cpu.memory[0xFF80], 0x99
 end
 
+def test_cpu_execute_operation_ldh_0xFF00_pointer_into_A(_args, assert)
+  cpu = build_cpu
+  operation = CPUTests.operation(type: :LDH, arguments: [:A, Operation::Pointer[0x80]])
+  cpu.memory[0xFF80] = 0x99
+
+  cpu.execute operation
+
+  assert.equal! cpu.registers.a, 0x99
+end
+
 def test_cpu_execute_operation_ldh_flags(_args, assert)
   CPUTests.test_flags(assert) do
     operation_will_not_change_any_flags type: :LDH, arguments: [Operation::Pointer[0x80], :A]
