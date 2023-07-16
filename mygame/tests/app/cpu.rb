@@ -152,6 +152,73 @@ def test_cpu_execute_operation_ldd_flags(_args, assert)
   end
 end
 
+def test_cpu_execute_operation_sub_8bit_register(_args, assert)
+  cpu = build_cpu
+  operation = CPUTests.operation(type: :SUB, arguments: [:A, :B])
+  cpu.registers.a = 0x34
+  cpu.registers.b = 0x33
+
+  cpu.execute operation
+
+  assert.equal! cpu.registers.a, 0x01
+end
+
+def test_cpu_execute_operation_sub_8bit_register_overflow(_args, assert)
+  cpu = build_cpu
+  operation = CPUTests.operation(type: :SUB, arguments: [:A, :B])
+  cpu.registers.a = 0x34
+  cpu.registers.b = 0x35
+
+  cpu.execute operation
+
+  assert.equal! cpu.registers.a, 0xFF
+end
+
+def test_cpu_execute_operation_sub_flags(_args, assert)
+  CPUTests.test_flags(assert) do
+    arguments_that_result_not_in_zero = lambda { |registers, _memory|
+      registers.a = 0x34
+      registers.e = 0x33
+    }
+    operation_will_set_flags(
+      { type: :SUB, arguments: [:A, :E] },
+      to: { z: 0, n: 1 },
+      given: arguments_that_result_not_in_zero
+    )
+
+    arguments_that_result_in_zero = lambda { |registers, _memory|
+      registers.a = 0x34
+      registers.e = 0x34
+    }
+    operation_will_set_flags(
+      { type: :SUB, arguments: [:A, :E] },
+      to: { z: 1, n: 1 },
+      given: arguments_that_result_in_zero
+    )
+
+    arguments_that_result_in_half_carry = lambda { |registers, _memory|
+      registers.a = 0x10
+      registers.e = 0x01
+    }
+    operation_will_set_flags(
+      { type: :SUB, arguments: [:A, :E] },
+      to: { h: 1, n: 1 },
+      given: arguments_that_result_in_half_carry
+    )
+
+    arguments_that_result_in_carry = lambda { |registers, _memory|
+      registers.a = 0x01
+      registers.e = 0x10
+    }
+    operation_will_set_flags(
+      { type: :SUB, arguments: [:A, :E] },
+      to: { c: 1, n: 1 },
+      given: arguments_that_result_in_carry
+    )
+  end
+end
+
+
 def test_cpu_execute_operation_inc_8bit_register(_args, assert)
   cpu = build_cpu
   operation = CPUTests.operation(type: :INC, arguments: [:C])
@@ -226,7 +293,7 @@ def test_cpu_execute_operation_inc_16bit_register_flags(_args, assert)
   end
 end
 
-def test_cpu_execute_operation_decc_8bit_register(_args, assert)
+def test_cpu_execute_operation_dec_8bit_register(_args, assert)
   cpu = build_cpu
   operation = CPUTests.operation(type: :DEC, arguments: [:C])
   cpu.registers.c = 0x12

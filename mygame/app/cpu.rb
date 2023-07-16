@@ -77,6 +77,15 @@ class CPU
     @registers.hl -= 1
   end
 
+  def execute_SUB(operation)
+    old_value = @registers.a
+    @registers.a = (@registers.a - source_value(operation[:arguments][1])) & 0xFF
+    @registers.flag_n = 1
+    assign_flag_z @registers.a
+    assign_flag_c old_value, @registers.a
+    assign_flag_h old_value, @registers.a
+  end
+
   def execute_INC(operation)
     register = operation[:arguments][0].downcase
     case register
