@@ -1,9 +1,22 @@
 class LCD
-  attr_accessor :mode, :scanline
+  attr_accessor :mode
 
   def initialize
+    @values = {}
     @mode = :oam_scan
-    @scanline = 0
+    self.scanline = 0
+  end
+
+  def [](address)
+    @values[address]
+  end
+
+  def scanline
+    @values[0xFF44]
+  end
+
+  def scanline=(value)
+    @values[0xFF44] = value
   end
 
   def advance_scanline
@@ -13,14 +26,14 @@ class LCD
     when :pixel_transfer
       @mode = :hblank
     when :hblank
-      @scanline += 1
-      @mode = @scanline == 144 ? :vblank : :oam_scan
+      self.scanline += 1
+      @mode = scanline == 144 ? :vblank : :oam_scan
     when :vblank
-      if @scanline == 153
-        @scanline = 0
+      if scanline == 153
+        self.scanline = 0
         @mode = :oam_scan
       else
-        @scanline += 1
+        self.scanline += 1
       end
     end
   end

@@ -29,3 +29,11 @@ end
     assert.equal! lcd.scanline, scanline_after
   end
 end
+
+def test_lcd_setting_scanline_updates_ff44(_args, assert)
+  lcd = build_lcd
+
+  lcd.scanline = 42
+
+  assert.equal! lcd[0xFF44], 42
+end
