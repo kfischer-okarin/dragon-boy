@@ -4,7 +4,8 @@ module Screens
       memory: 'Memory',
       sound: 'Sound Channels',
       vram_tiles: 'Tiles & Objects',
-      vram_tilemaps: 'Tilemaps'
+      vram_tilemaps: 'Tilemaps',
+      lcd: 'LCD'
     }.freeze
 
     def initialize(args, game_boy:)
@@ -27,6 +28,7 @@ module Screens
       @sound_view = UI::SoundView.new(game_boy.io, **right_view_rect)
       @vram_tiles_view = UI::VRAMTilesView.new(game_boy.vram, **right_view_rect)
       @vram_tilemaps_view = UI::VRAMTilemapsView.new(game_boy.vram, **right_view_rect)
+      @lcd_view = UI::LCDView.new(game_boy.lcd, **right_view_rect)
 
       @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
     end
@@ -159,6 +161,10 @@ module Screens
 
     def render_vram_tilemaps_view(args)
       @vram_tilemaps_view.render(args.outputs)
+    end
+
+    def render_lcd_view(args)
+      @lcd_view.render(args.outputs)
     end
 
     def update_misc_info_view
