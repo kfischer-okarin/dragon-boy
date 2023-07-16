@@ -1,5 +1,5 @@
 class Clock
-  attr_reader :schedule, :cycle
+  attr_reader :schedule, :cycle, :seconds
 
   CYCLES_PER_SECOND = 4_194_304
 
@@ -8,6 +8,7 @@ class Clock
     @lcd = lcd
     @schedule = []
     @cycle = 0
+    @seconds = 0
   end
 
   def schedule_method(cycle, method)
@@ -22,14 +23,14 @@ class Clock
   def advance_to_cycle(cycle)
     advance while @schedule.any? && @schedule.first[:cycle] <= effective_cycle(cycle)
 
-    @cycle = cycle
+    self.cycle = cycle
   end
 
   def advance
     return if @schedule.empty?
 
     next_cycle_with_method = @schedule.first[:cycle]
-    @cycle = next_cycle_with_method
+    self.cycle = next_cycle_with_method
     while @schedule.any? && @schedule.first[:cycle] == next_cycle_with_method
       method = @schedule.shift[:method]
       send method
@@ -62,6 +63,11 @@ class Clock
     else
       cycle
     end
+  end
+
+  def cycle=(value)
+    @seconds += effective_cycle(value).idiv(CYCLES_PER_SECOND)
+    @cycle = value % CYCLES_PER_SECOND
   end
 end
 

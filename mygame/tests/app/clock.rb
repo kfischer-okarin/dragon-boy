@@ -123,6 +123,28 @@ def test_clock_schedule_method_should_loop_cycle_at_4mhz(_args, assert)
   ]
 end
 
+def test_clock_advance_count_cycles(_args, assert)
+  clock = build_clock
+  clock.define_singleton_method :foo do; end
+  clock.advance_to_cycle 1000
+  clock.schedule_method 50, :foo
+
+  clock.advance
+
+  assert.equal! clock.cycle, 50
+  assert.equal! clock.seconds, 1
+end
+
+def test_clock_advance_to_cycle_counts_seconds(_args, assert)
+  clock = build_clock
+
+  assert.equal! clock.seconds, 0
+
+  clock.advance_to_cycle 4_194_304
+
+  assert.equal! clock.seconds, 1
+end
+
 def test_clock_advance_to_cycle_advance_to_past_cycle_must_go_to_the_end_first(_args, assert)
   clock = build_clock
   method_calls = listen_for_method_calls clock, [:foo, :bar]
