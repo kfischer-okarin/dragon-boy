@@ -3,8 +3,9 @@ class Clock
 
   CYCLES_PER_SECOND = 4_194_304
 
-  def initialize(cpu:)
+  def initialize(cpu:, lcd:)
     @cpu = cpu
+    @lcd = lcd
     @schedule = []
     @cycle = 0
   end
@@ -42,6 +43,15 @@ class Clock
   def execute_next_operation
     @cpu.execute_next_operation
     schedule_next_cpu_operation
+  end
+
+  def schedule_next_lcd_scanline
+    schedule_method @cycle + @lcd.current_mode_duration, :advance_lcd_scanline
+  end
+
+  def advance_lcd_scanline
+    @lcd.advance_scanline
+    schedule_next_lcd_scanline
   end
 
   private

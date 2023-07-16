@@ -4,8 +4,8 @@ def build_cpu(registers: nil, memory: nil)
   CPU.new registers: registers || Registers.new, memory: memory || Memory.new
 end
 
-def build_clock(cpu: nil)
-  Clock.new cpu: cpu || build_cpu
+def build_clock(cpu: nil, lcd: nil)
+  Clock.new cpu: cpu || build_cpu, lcd: lcd || build_lcd
 end
 
 def build_lcd
