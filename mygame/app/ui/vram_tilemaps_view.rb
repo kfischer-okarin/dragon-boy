@@ -1,11 +1,12 @@
 module UI
   class VRAMTilemapsView
-    attr_accessor :vram, :x, :y, :w, :h
+    attr_accessor :vram, :lcd, :x, :y, :w, :h
 
     attr_rect
 
-    def initialize(vram, x:, y:, w:, h:)
+    def initialize(vram:, lcd:, x:, y:, w:, h:)
       @vram = vram
+      @lcd = lcd
       @x = x
       @y = y
       @w = w
@@ -57,6 +58,12 @@ module UI
       gtk_outputs.primitives << {
         x: x, y: top - 256, w: 256, h: 256, path: render_target_name
       }.sprite!
+      gtk_outputs.primitives << {
+        x: x + @lcd.viewport_position[:x],
+        y: top - @lcd.viewport_position[:y] - 144,
+        w: 160,
+        h: 144,
+      }.border!
     end
   end
 end

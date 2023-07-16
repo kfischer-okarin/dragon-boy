@@ -27,7 +27,11 @@ module Screens
       @memory_view.offset = game_boy.registers.pc & 0xFFF0
       @sound_view = UI::SoundView.new(game_boy.io, **right_view_rect)
       @vram_tiles_view = UI::VRAMTilesView.new(game_boy.vram, **right_view_rect)
-      @vram_tilemaps_view = UI::VRAMTilemapsView.new(game_boy.vram, **right_view_rect)
+      @vram_tilemaps_view = UI::VRAMTilemapsView.new(
+        vram: game_boy.vram,
+        lcd: game_boy.lcd,
+        **right_view_rect
+      )
       @lcd_view = UI::LCDView.new(game_boy.lcd, **right_view_rect)
 
       @misc_info_view = UI::MiscInfoView.new(game_boy, x: 640, y: 0, w: 200, h: registers_view_h)
