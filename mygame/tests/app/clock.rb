@@ -161,13 +161,13 @@ end
 def test_clock_schedule_next_cpu_operation(_args, assert)
   cpu = Object.new
   cpu.define_singleton_method :next_operation_duration do
-    32
+    8
   end
   clock = build_clock cpu: cpu
 
   clock.schedule_next_cpu_operation
 
-  assert.contains! clock.schedule, { cycle: 32, method: :execute_next_operation }
+  assert.contains! clock.schedule, { cycle: 8, method: :execute_next_operation }
 end
 
 def test_clock_execute_next_operation(_args, assert)
@@ -177,26 +177,26 @@ def test_clock_execute_next_operation(_args, assert)
     cpu_called = true
   end
   cpu.define_singleton_method :next_operation_duration do
-    cpu_called ? 32 : 16
+    cpu_called ? 8 : 4
   end
   clock = build_clock cpu: cpu
 
   clock.execute_next_operation
 
   assert.true! cpu_called
-  assert.contains! clock.schedule, { cycle: 32, method: :execute_next_operation }
+  assert.contains! clock.schedule, { cycle: 8, method: :execute_next_operation }
 end
 
 def test_clock_schedule_next_lcd_scanline(_args, assert)
   lcd = Object.new
   lcd.define_singleton_method :current_mode_duration do
-    32
+    8
   end
   clock = build_clock lcd: lcd
 
   clock.schedule_next_lcd_scanline
 
-  assert.contains! clock.schedule, { cycle: 32, method: :advance_lcd_scanline }
+  assert.contains! clock.schedule, { cycle: 8, method: :advance_lcd_scanline }
 end
 
 def test_clock_advance_lcd_scanline(_args, assert)
@@ -206,12 +206,12 @@ def test_clock_advance_lcd_scanline(_args, assert)
     lcd_called = true
   end
   lcd.define_singleton_method :current_mode_duration do
-    lcd_called ? 32 : 16
+    lcd_called ? 8 : 4
   end
   clock = build_clock lcd: lcd
 
   clock.advance_lcd_scanline
 
   assert.true! lcd_called
-  assert.contains! clock.schedule, { cycle: 32, method: :advance_lcd_scanline }
+  assert.contains! clock.schedule, { cycle: 8, method: :advance_lcd_scanline }
 end

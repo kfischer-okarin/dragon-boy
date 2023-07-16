@@ -728,25 +728,25 @@ end
 def test_cpu_next_operation_duration_non_jump(_args, assert)
   cpu = build_cpu
   cpu.define_singleton_method :next_operation do
-    { type: :NOP, arguments: [], cycles: 16 }
+    { type: :NOP, arguments: [], cycles: 4 }
   end
 
-  assert.equal! cpu.next_operation_duration, 16
+  assert.equal! cpu.next_operation_duration, 4
 end
 
 def test_cpu_next_operation_duration_conditional_jump(_args, assert)
   cpu = build_cpu
   [:JR, :JP, :CALL, :RET].each do |type|
     cpu.define_singleton_method :next_operation do
-      { type: type, arguments: [:Z], cycles: { taken: 20, untaken: 8 } }
+      { type: type, arguments: [:Z], cycles: { taken: 5, untaken: 2 } }
     end
     cpu.registers.flag_z = 1
 
-    assert.equal! cpu.next_operation_duration, 20
+    assert.equal! cpu.next_operation_duration, 5
 
     cpu.registers.flag_z = 0
 
-    assert.equal! cpu.next_operation_duration, 8
+    assert.equal! cpu.next_operation_duration, 2
   end
 end
 
@@ -754,10 +754,10 @@ def test_cpu_next_operation_duration_unconditional_jump(_args, assert)
   cpu = build_cpu
   [:JR, :JP, :CALL, :RET].each do |type|
     cpu.define_singleton_method :next_operation do
-      { type: type, arguments: [], cycles: 20 }
+      { type: type, arguments: [], cycles: 5 }
     end
 
-    assert.equal! cpu.next_operation_duration, 20
+    assert.equal! cpu.next_operation_duration, 5
   end
 end
 
