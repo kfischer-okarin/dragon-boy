@@ -113,6 +113,16 @@ def test_clock_schedule_method_should_schedule_past_items_after_4mhz(_args, asse
   ]
 end
 
+def test_clock_schedule_method_should_loop_cycle_at_4mhz(_args, assert)
+  clock = build_clock
+
+  clock.schedule_method 4_194_304 + 3000, :foo
+
+  assert.equal! clock.schedule, [
+    { cycle: 3000, method: :foo }
+  ]
+end
+
 def test_clock_advance_to_cycle_advance_to_past_cycle_must_go_to_the_end_first(_args, assert)
   clock = build_clock
   method_calls = listen_for_method_calls clock, [:foo, :bar]

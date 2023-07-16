@@ -11,7 +11,7 @@ class Clock
   end
 
   def schedule_method(cycle, method)
-    @schedule << { cycle: cycle, method: method }
+    @schedule << { cycle: cycle % CYCLES_PER_SECOND, method: method }
     @schedule = @schedule.sort_by { |item| effective_cycle(item[:cycle]) }
   end
 
