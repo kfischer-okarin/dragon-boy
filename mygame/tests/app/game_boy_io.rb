@@ -186,15 +186,6 @@ def test_io_sound_master_volume(_args, assert)
   assert.equal! io.sound[:volume_right], 0.375
 end
 
-def test_io_viewport_position(_args, assert)
-  io = GameBoyIO.new
-
-  io[0xFF42] = 123
-  io[0xFF43] = 222
-
-  assert.equal! io.viewport_position, { x: 222, y: 123 }
-end
-
 def test_io_lcd(_args, assert)
   io = GameBoyIO.new
 

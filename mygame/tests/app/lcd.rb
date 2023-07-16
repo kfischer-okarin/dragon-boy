@@ -62,3 +62,12 @@ def test_lcd_readonly_registers(_args, assert)
     assert.not_equal! lcd[address], 0xAA
   end
 end
+
+def test_lcd_viewport_position(_args, assert)
+  lcd = LCD.new
+
+  lcd[0xFF42] = 123
+  lcd[0xFF43] = 222
+
+  assert.equal! lcd.viewport_position, { x: 222, y: 123 }
+end

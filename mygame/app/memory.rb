@@ -53,7 +53,7 @@ class Memory
     case address
     when 0xFF47, 0x8000..0x9FFF
       @vram || @content
-    when 0xFF44
+    when 0xFF42..0xFF44
       @lcd || @content
     when 0xFF00..0xFF7F
       @io || @content

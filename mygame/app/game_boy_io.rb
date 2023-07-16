@@ -1,5 +1,5 @@
 class GameBoyIO
-  attr_reader :palettes, :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4, :viewport_position, :lcd
+  attr_reader :palettes, :sound, :sound_channel1, :sound_channel2, :sound_channel3, :sound_channel4, :lcd
 
   def initialize
     @values = {}
@@ -9,7 +9,6 @@ class GameBoyIO
     @sound_channel2 = {}
     @sound_channel3 = {}
     @sound_channel4 = {}
-    @viewport_position = {}
     @lcd = {}
   end
 
@@ -64,10 +63,6 @@ class GameBoyIO
       @lcd[:sprite_height] = value & 0b00000100 != 0 ? 16 : 8
       @lcd[:sprites_enabled] = value & 0b00000010 != 0
       @lcd[:bg_enabled] = value & 0b00000001 != 0
-    when 0xFF42
-      @viewport_position[:y] = value
-    when 0xFF43
-      @viewport_position[:x] = value
     when 0xFF00..0xFF7F
       # Not yet implemented
     else

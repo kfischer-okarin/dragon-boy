@@ -2,9 +2,19 @@ class LCD
   attr_accessor :mode
 
   def initialize
-    @values = {}
+    @values = {
+      0xFF42 => 0,
+      0xFF43 => 0,
+    }
     @mode = :oam_scan
     self.scanline = 0
+  end
+
+  def viewport_position
+    {
+      x: @values[0xFF43],
+      y: @values[0xFF42]
+    }
   end
 
   def [](address)
@@ -13,11 +23,13 @@ class LCD
 
   def []=(address, value)
     case address
+    when 0xFF42, 0xFF43
     when 0xFF44
-      # Read-only
+      return # read-only
     else
       raise 'Illegal LCD address: %04X' % address
     end
+    @values[address] = value
   end
 
   def scanline
