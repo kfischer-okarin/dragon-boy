@@ -5,7 +5,7 @@ module UI
 
     attr_accessor :bytes, :x, :y, :w, :h, :offset, :highlights, :breakpoints, :comments
 
-    attr_reader :hovered_line
+    attr_reader :hovered_line, :memory_areas
 
     attr_rect
 
@@ -20,8 +20,16 @@ module UI
       @rendered_lines = []
       @breakpoints = {}
       @comments = {}
+      @memory_areas = {}
       @lines = {}
       @parsed_up_to = -1
+    end
+
+    def memory_areas=(value)
+      lowest_memory_area_address = value.keys.min
+      @lines.delete_if { |address, _| address >= lowest_memory_area_address }
+      @parsed_up_to = @lines.keys.max || -1
+      @memory_areas = value
     end
 
     def update(args)
@@ -85,6 +93,27 @@ module UI
         previous_address = @parsed_up_to
       end
 
+      next_line = if @memory_areas.key?(address)
+                    build_memory_area_line(address, previous_address)
+                  else
+                    build_operation_line(address, previous_address)
+                  end
+      @parsed_up_to = address
+      @lines[address] = next_line
+    end
+
+    def build_memory_area_line(address, previous_address)
+      memory_area = @memory_areas[address]
+      {
+        address: address,
+        previous_address: previous_address,
+        next_address: address + memory_area[:length],
+        text: memory_area[:name],
+        operation: { type: :DATA, length: memory_area[:length] }
+      }
+    end
+
+    def build_operation_line(address, previous_address)
       operation = Operation.parse(@bytes, address)
       argument_strings = operation[:arguments].map { |argument|
         case argument
@@ -112,9 +141,8 @@ module UI
         operation: operation,
         target_address: calc_target_address(address, operation)
       }
-      @parsed_up_to = address
       result.compact!
-      @lines[address] = result
+      result
     end
 
     def calc_target_address(address, operation)

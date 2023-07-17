@@ -20,6 +20,7 @@ module Screens
       @program_view = UI::ProgramView.new(game_boy.memory, x: 0, y: 0, w: 640, h: 720)
       @program_view.offset = game_boy.registers.pc
       reload_comments
+      load_memory_areas
       @registers_view = UI::RegistersView.new(game_boy.registers, x: 1080, y: 0, w: 200, h: registers_view_h)
 
       right_view_rect = { x: 640, y: registers_view_h, w: 640, h: 720 - registers_view_h }
@@ -209,6 +210,22 @@ module Screens
       return {} unless json_content
 
       json_content.transform_keys! { |address| address.to_i(16) }
+      json_content
+    end
+
+    def load_memory_areas
+      game_boy = @state.game_boy
+      @program_view.memory_areas = memory_areas = {}
+      memory_areas.merge! parse_memory_area_file("roms/#{game_boy.rom}")
+      memory_areas.merge! parse_memory_area_file(game_boy.boot_rom)
+    end
+
+    def parse_memory_area_file(filename)
+      json_content = $gtk.parse_json_file("#{filename}.memory_areas.json")
+      return {} unless json_content
+
+      json_content.transform_keys! { |address| address.to_i(16) }
+      json_content.transform_values! { |memory_area| memory_area.transform_keys!(&:to_sym) }
       json_content
     end
   end
