@@ -200,10 +200,16 @@ module Screens
     def reload_comments
       game_boy = @state.game_boy
       @program_view.comments = comments = {}
-      rom_comments = $gtk.parse_json_file("roms/#{game_boy.rom}.comments.json")
-      comments.merge!(rom_comments.transform_keys { |address| address.to_i(16) }) if rom_comments
-      boot_rom_comments = $gtk.parse_json_file("#{game_boy.boot_rom}.comments.json")
-      comments.merge!(boot_rom_comments.transform_keys { |address| address.to_i(16) }) if boot_rom_comments
+      comments.merge! parse_comment_file("roms/#{game_boy.rom}")
+      comments.merge! parse_comment_file(game_boy.boot_rom)
+    end
+
+    def parse_comment_file(filename)
+      json_content = $gtk.parse_json_file("#{filename}.comments.json")
+      return {} unless json_content
+
+      json_content.transform_keys! { |address| address.to_i(16) }
+      json_content
     end
   end
 end
