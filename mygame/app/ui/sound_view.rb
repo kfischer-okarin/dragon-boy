@@ -86,7 +86,8 @@ module UI
     end
 
     def render_pulse_frequency_information(gtk_outputs, channel, x, y)
-      gtk_outputs.primitives << { x: x, y: y, text: "Frequency: #{channel[:frequency]}" }.label!
+      frequency_string = channel[:frequency].nil? ? '---' : '%.2f' % channel[:frequency]
+      gtk_outputs.primitives << { x: x, y: y, text: "Frequency: #{frequency_string}"}.label!
       y -= 20
     end
 
