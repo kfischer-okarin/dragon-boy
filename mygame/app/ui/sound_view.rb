@@ -37,6 +37,8 @@ module UI
       y = render_duty_cycle_information(gtk_outputs, channel1, left_column_x, y)
       y -= 20
       y = render_volume_information(gtk_outputs, channel1, left_column_x, y)
+      y -= 20
+      y = render_pulse_frequency_information(gtk_outputs, channel1, left_column_x, y)
 
       y -= 40
       channel2 = @io.sound_channel2
@@ -45,6 +47,8 @@ module UI
       y = render_duty_cycle_information(gtk_outputs, channel2, left_column_x, y)
       y -= 20
       y = render_volume_information(gtk_outputs, channel2, left_column_x, y)
+      y -= 20
+      y = render_pulse_frequency_information(gtk_outputs, channel1, left_column_x, y)
 
       right_column_x = center_x + 10
       y = top - vertical_padding - 40 - 40
@@ -79,6 +83,11 @@ module UI
                       end
       gtk_outputs.primitives << { x: x, y: y, text: "Envelope: #{envelope_text}" }.label!
       y
+    end
+
+    def render_pulse_frequency_information(gtk_outputs, channel, x, y)
+      gtk_outputs.primitives << { x: x, y: y, text: "Frequency: #{channel[:frequency]}" }.label!
+      y -= 20
     end
 
     def fetch_value

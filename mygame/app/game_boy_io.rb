@@ -41,6 +41,12 @@ class GameBoyIO
       # Even if the volume reaches 0, the channel is not disabled.
       # A timer value of 0 disables the envelope.
       channel[:envelope_sweep_timer] = value & 0b00000111
+    when 0xFF13, 0xFF18
+      channel = sound_channel(address)
+      channel[:frequency] = calc_pulse_channel_frequency value, @values[address + 1]
+    when 0xFF14, 0xFF19
+      channel = sound_channel(address)
+      channel[:frequency] = calc_pulse_channel_frequency @values[address - 1], value
     when 0xFF24
       # Bit 7 and 3 are for VIN panning (not implemented)
 
@@ -82,9 +88,9 @@ class GameBoyIO
 
   def sound_channel(address)
     case address
-    when 0xFF11, 0xFF12
+    when 0xFF11..0xFF14
       @sound_channel1
-    when 0xFF16, 0xFF17
+    when 0xFF16..0xFF19
       @sound_channel2
     when 0xFF21
       @sound_channel4
@@ -102,5 +108,11 @@ class GameBoyIO
     else
       :center
     end
+  end
+
+  def calc_pulse_channel_frequency(lower_byte, upper_byte)
+    return unless lower_byte && upper_byte
+
+    131_072 / (2048 - ((upper_byte & 0b111) << 8 | lower_byte))
   end
 end
