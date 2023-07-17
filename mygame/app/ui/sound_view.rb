@@ -32,7 +32,7 @@ module UI
 
       y -= 40
       channel1 = @io.sound_channel1
-      gtk_outputs.primitives << { x: left_column_x, y: y, text: "Channel 1 (#{channel1[:panning]})", size_enum: 1.5 }.label!
+      y = render_channel_header(gtk_outputs, channel1, 1, left_column_x, y)
       y -= 30
       y = render_duty_cycle_information(gtk_outputs, channel1, left_column_x, y)
       y -= 20
@@ -42,24 +42,24 @@ module UI
 
       y -= 40
       channel2 = @io.sound_channel2
-      gtk_outputs.primitives << { x: left_column_x, y: y, text: "Channel 2 (#{channel2[:panning]})", size_enum: 1.5 }.label!
+      y = render_channel_header(gtk_outputs, channel2, 2, left_column_x, y)
       y -= 30
       y = render_duty_cycle_information(gtk_outputs, channel2, left_column_x, y)
       y -= 20
       y = render_volume_information(gtk_outputs, channel2, left_column_x, y)
       y -= 20
-      y = render_pulse_frequency_information(gtk_outputs, channel1, left_column_x, y)
+      y = render_pulse_frequency_information(gtk_outputs, channel2, left_column_x, y)
 
       right_column_x = center_x + 10
       y = top - vertical_padding - 40 - 40
       channel3 = @io.sound_channel3
-      gtk_outputs.primitives << { x: right_column_x, y: y, text: "Channel 3 (#{channel3[:panning]})", size_enum: 1.5 }.label!
+      y = render_channel_header(gtk_outputs, channel3, 3, right_column_x, y)
       y -= 30
       y = render_volume_information(gtk_outputs, channel3, right_column_x, y)
 
       y -= 40
       channel4 = @io.sound_channel4
-      gtk_outputs.primitives << { x: right_column_x, y: y, text: "Channel 4 (#{channel4[:panning]})", size_enum: 1.5 }.label!
+      y = render_channel_header(gtk_outputs, channel4, 4, right_column_x, y)
       y -= 30
       y = render_volume_information(gtk_outputs, channel4, right_column_x, y)
     end
@@ -67,7 +67,22 @@ module UI
     def render_duty_cycle_information(gtk_outputs, channel, x, y)
       gtk_outputs.primitives << { x: x, y: y, text: "Duty Cycle: #{channel[:duty_cycle]}" }.label!
       y -= 20
-      gtk_outputs.primitives << { x: x, y: y, text: "Length Timer: #{channel[:length_timer]}" }.label!
+      text = "Length Timer: #{channel[:length_timer]}"
+      text += ' (off)' unless channel[:length_enabled]
+      gtk_outputs.primitives << { x: x, y: y, text: text }.label!
+      y
+    end
+
+    def render_channel_header(gtk_outputs, channel, number, x, y)
+      status = channel[:enabled] ? 'ON' : 'OFF'
+      if channel[:panning] == :off
+        status = 'OFF'
+      else
+        status += " - #{channel[:panning]}"
+      end
+      gtk_outputs.primitives << {
+        x: x, y: y, text: "Channel #{number} (#{status})", size_enum: 1.5
+      }.label!
       y
     end
 

@@ -47,6 +47,8 @@ class GameBoyIO
     when 0xFF14, 0xFF19
       channel = sound_channel(address)
       channel[:frequency] = calc_pulse_channel_frequency @values[address - 1], value
+      channel[:enabled] = value & 0b10000000 != 0
+      channel[:length_enabled] = value & 0b01000000 != 0
     when 0xFF24
       # Bit 7 and 3 are for VIN panning (not implemented)
 

@@ -58,7 +58,7 @@ def test_io_sound_channel1_duty_cycle(_args, assert)
   end
 end
 
-def test_io_sound_channel1_frequency(_args, assert)
+def test_io_sound_channel_frequency(_args, assert)
   io = GameBoyIO.new
 
   [
@@ -73,6 +73,28 @@ def test_io_sound_channel1_frequency(_args, assert)
 
     expected_frequency = 131_072 / (2048 - 0b11110000011)
     assert.equal! sound_channel[:frequency], expected_frequency
+  end
+end
+
+def test_io_sound_channel_enabled_sound_length_enabled(_args, assert)
+  io = GameBoyIO.new
+
+  [
+    { address: 0xFF14, channel: :sound_channel1 },
+    { address: 0xFF19, channel: :sound_channel2 }
+  ].each do |channel|
+    address = channel[:address]
+    sound_channel = io.send(channel[:channel])
+
+    io[address] = 0b11000000
+
+    assert.equal! sound_channel[:enabled], true
+    assert.equal! sound_channel[:length_enabled], true
+
+    io[address] = 0b00000000
+
+    assert.equal! sound_channel[:enabled], false
+    assert.equal! sound_channel[:length_enabled], false
   end
 end
 
