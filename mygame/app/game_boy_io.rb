@@ -30,7 +30,7 @@ class GameBoyIO
     when 0xFF12, 0xFF17, 0xFF21
       channel = sound_channel(address)
       # Volume is in units of 1/15
-      channel[:volume] = ((value & 0b11110000) >> 4) / 15.0
+      channel[:volume] = (value & 0b11110000) >> 4
       channel[:envelope_direction] = (value & 0b00001000).zero? ? -1 : 1
       # DIV-APU counter is increased at 512Hz (every 8192 CPU cycles)
       # Every 8 increments of the DIV-APU counter (every 1/64 second),
@@ -43,10 +43,10 @@ class GameBoyIO
       channel[:envelope_sweep_timer] = value & 0b00000111
     when 0xFF13, 0xFF18
       channel = sound_channel(address)
-      channel[:frequency] = calc_pulse_channel_frequency value, @values[address + 1]
+      channel[:period_value] = calc_pulse_channel_period_value value, @values[address + 1]
     when 0xFF14, 0xFF19
       channel = sound_channel(address)
-      channel[:frequency] = calc_pulse_channel_frequency @values[address - 1], value
+      channel[:period_value] = calc_pulse_channel_period_value @values[address - 1], value
       channel[:enabled] = value & 0b10000000 != 0
       channel[:length_enabled] = value & 0b01000000 != 0
     when 0xFF24
@@ -110,6 +110,12 @@ class GameBoyIO
     else
       :center
     end
+  end
+
+  def calc_pulse_channel_period_value(lower_byte, upper_byte)
+    return unless lower_byte && upper_byte
+
+    ((upper_byte & 0b111) << 8) | lower_byte
   end
 
   def calc_pulse_channel_frequency(lower_byte, upper_byte)

@@ -58,7 +58,7 @@ def test_io_sound_channel1_duty_cycle(_args, assert)
   end
 end
 
-def test_io_sound_channel_frequency(_args, assert)
+def test_io_sound_channel_period_value(_args, assert)
   io = GameBoyIO.new
 
   [
@@ -71,8 +71,7 @@ def test_io_sound_channel_frequency(_args, assert)
     io[address] = 0b10000011
     io[address + 1] = 0b10000111
 
-    expected_frequency = 131_072 / (2048 - 0b11110000011)
-    assert.equal! sound_channel[:frequency], expected_frequency
+    assert.equal! sound_channel[:period_value], 0b11110000011
   end
 end
 
@@ -133,9 +132,9 @@ def test_io_sound_channel_volume(_args, assert)
     { address: 0xFF21, channel: :sound_channel4 }
   ].each do |channel|
     [
-      { bit8765: 0b0000, volume: 0.0 },
-      { bit8765: 0b1111, volume: 1.0 },
-      { bit8765: 0b0111, volume: 7.0 / 15.0 }
+      { bit8765: 0b0000, volume: 0 },
+      { bit8765: 0b1111, volume: 15 },
+      { bit8765: 0b0111, volume: 7 }
     ].each do |test_case|
       register_value = test_case[:bit8765] << 4
 
