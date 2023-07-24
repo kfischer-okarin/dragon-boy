@@ -1,3 +1,4 @@
+require 'app/apu/sampler.rb'
 require 'app/game_boy.rb'
 require 'app/clock.rb'
 require 'app/cpu.rb'
