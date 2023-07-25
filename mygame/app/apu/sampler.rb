@@ -16,6 +16,10 @@ class APU
       @cycle = 0
     end
 
+    def cycle_of_output_sample(index)
+      @output_sample_cycles[index]
+    end
+
     def next_samples(count)
       result = []
       result << next_output_sample while result.length < count

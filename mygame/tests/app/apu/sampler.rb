@@ -101,3 +101,17 @@ def test_sampler_samples_until_cycle_wrap_around(_args, assert)
   # Output 0   1     2     0     1     2     0
   assert.equal! output_samples, [0x2, 0x0, 0x1, 0x2]
 end
+
+def test_sampler_cycle_of_output_sample(_args, assert)
+  sampler = APU::Sampler.new(
+    clock_frequency: 20,
+    output_sample_rate: 7,
+    sample_period: 3,
+    sample: [0x0, 0x1, 0x2]
+  )
+
+  # Clock  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+  # Sample 0     1     2     0     1     2     0
+  # Output 0   0     1     2     0     1     2
+  assert.equal! sampler.cycle_of_output_sample(3), 8
+end
