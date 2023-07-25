@@ -17,14 +17,14 @@ class APU
 
     def next_samples(count)
       result = []
-      while result.length < count
-        if @cycle < @next_sample_cycle
-          result << @current_sample
-          self.output_sample_index = @output_sample_index + 1
-        else
-          next_sample
-        end
-      end
+      result << next_output_sample while result.length < count
+      result
+    end
+
+    def next_output_sample
+      result = @current_sample
+      self.output_sample_index = @output_sample_index + 1
+      move_to_next_sample if @cycle >= @next_sample_cycle
       result
     end
 
@@ -33,16 +33,10 @@ class APU
       return result if target_cycle == @cycle
 
       if target_cycle < @cycle # We need to loop around first
-        until @output_sample_index.zero?
-          result << @current_sample
-          move_to_next_output_sample
-        end
+        result << next_output_sample until @output_sample_index.zero?
       end
 
-      while @cycle <= target_cycle
-        result << @current_sample
-        move_to_next_output_sample
-      end
+      result << next_output_sample while @cycle <= target_cycle
       @cycle = target_cycle
 
       result
@@ -50,12 +44,7 @@ class APU
 
     private
 
-    def move_to_next_output_sample
-      self.output_sample_index = @output_sample_index + 1
-      next_sample if @cycle >= @next_sample_cycle
-    end
-
-    def next_sample
+    def move_to_next_sample
       @sample_index = (@sample_index + 1) % @sample.length
       @current_sample = @sample[@sample_index]
       @next_sample_cycle += @sample_period
