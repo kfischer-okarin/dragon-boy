@@ -28,17 +28,18 @@ module GTK
           raise "Expected exception to be raised but no exception was raised.\n#{exception_class_or_message}"
         end
       else
-        raised_exception_class = nil
+        exception_class = exception_class_or_message
+        raised_exception = nil
         begin
           yield
         rescue StandardError => e
-          raised_exception_class = e.class
+          raised_exception = e
         end
 
-        if raised_exception_class.nil?
+        if raised_exception.nil?
           raise "Expected exception #{exception_class} to be raised but no exception was raised.\n#{message}"
-        elsif !raised_exception_class.ancestors.include?(exception_class)
-          raise "Expected exception #{exception_class} to be raised but #{raised_exception_class} was raised.\n#{message}"
+        elsif !raised_exception.is_a? exception_class
+          raise "Expected exception #{exception_class} to be raised but #{raised_exception.class} was raised.\nError Message:\n#{raised_exception}#{message}"
         end
       end
 
