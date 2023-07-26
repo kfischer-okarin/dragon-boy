@@ -1,5 +1,7 @@
 class APU
   class Sampler
+    attr_reader :sample
+
     def initialize(clock_frequency:, output_sample_rate:, sample_period:, sample:)
       @clock_frequency = clock_frequency
       @output_sample_rate = output_sample_rate
@@ -14,6 +16,12 @@ class APU
       end
       @output_sample_index = 0
       @cycle = 0
+    end
+
+    def sample=(value)
+      @sample = value
+      @current_sample = @sample[@sample_index]
+      @sample
     end
 
     def cycle_of_output_sample(index)

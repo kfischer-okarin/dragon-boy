@@ -113,3 +113,18 @@ def test_sampler_cycle_of_output_sample(_args, assert)
   # Output 0   0     1     2     0     1     2
   assert.equal! sampler.cycle_of_output_sample(3), 8
 end
+
+def test_sampler_update_sample(_args, assert)
+  sampler = APU::Sampler.new(
+    clock_frequency: 15,
+    output_sample_rate: 5,
+    sample_period: 3,
+    sample: [0x0, 0x1, 0x2]
+  )
+
+  assert.equal! sampler.next_output_sample, 0x0
+
+  sampler.sample = [0x1, 0x2, 0x3]
+
+  assert.equal! sampler.next_output_sample, 0x2
+end
