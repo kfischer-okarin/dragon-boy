@@ -19,9 +19,8 @@ class APU
     end
 
     def sample=(value)
+      @current_sample = value[@sample_index]
       @sample = value
-      @current_sample = @sample[@sample_index]
-      @sample
     end
 
     def cycle_of_output_sample(index)
