@@ -1,1 +1,1 @@
-require_relative 'apu/sampler.rb'
+require_relative 'apu/pulse_channel.rb'

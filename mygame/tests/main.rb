@@ -1,3 +1,4 @@
+require 'tests/app/apu/pulse_channel.rb'
 require 'tests/app/apu/sampler.rb'
 require 'tests/app/clock.rb'
 require 'tests/app/cpu.rb'

@@ -1,5 +1,3 @@
-require 'tests/test_helper.rb'
-
 def test_sampler_next_samples_divisible_sample_rates(_args, assert)
   sampler = APU::Sampler.new(
     clock_frequency: 100,
