@@ -12,6 +12,14 @@ def build_lcd
   LCD.new
 end
 
+def build_pulse_channel
+  APU::PulseChannel.new(
+    output_sample_rate: 44_100,
+    sample_period: 50,
+    duty_cycle: 0.5
+  )
+end
+
 def listen_for_method_calls(object, methods)
   calls = []
   methods.each do |method|
