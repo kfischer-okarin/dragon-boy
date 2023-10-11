@@ -40,3 +40,11 @@ def test_pulse_channel_invalid_duty_cycle(_args, assert)
     pulse_channel.duty_cycle = 0.0
   end
 end
+
+def test_pulse_channel_frequency(_args, assert)
+  pulse_channel = build_pulse_channel
+
+  pulse_channel.sample_period = 0x500
+
+  assert.equal! pulse_channel.frequency.round(2), 170.67
+end

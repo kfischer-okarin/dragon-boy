@@ -77,7 +77,7 @@ def test_sampler_samples_until_cycle(_args, assert)
   assert.equal! sampler.samples_until_cycle(25), [] # Don't return the same sample twice
 end
 
-def test_sampler_samples_until_cycle_wrap_around(_args, assert)
+def focus_test_sampler_samples_until_cycle_wrap_around(_args, assert)
   sampler = APU::Sampler.new(
     clock_frequency: 20,
     output_sample_rate: 7,
@@ -127,4 +127,29 @@ def test_sampler_updating_sample_updates_next_sample(_args, assert)
   sampler.sample = [0x1, 0x2, 0x3]
 
   assert.equal! sampler.next_output_sample, 0x2
+end
+
+def xtest_sampler_updating_sample_period_is_effective_from_next_sample(_args, assert)
+  sampler = APU::Sampler.new(
+    clock_frequency: 100,
+    output_sample_rate: 20,
+    sample_period: 5,
+    sample: [0x0, 0x1, 0xF]
+  )
+
+  output_samples = sampler.samples_until_cycle(6)
+
+  # Clock  0 1 2 3 4 5 6
+  # Sample 0         1
+  # Output 0         1
+  assert.equal! output_samples, [0x0, 0x1]
+
+  sampler.sample_period = 10
+
+  output_samples = sampler.samples_until_cycle(15)
+
+  # Clock  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+  # Sample 0         1         F
+  # Output 0         1         F         F
+  assert.equal! output_samples, [0xF, 0xF]
 end

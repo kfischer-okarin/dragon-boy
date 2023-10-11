@@ -43,6 +43,9 @@ class GameBoyIO
       channel[:envelope_sweep_timer] = value & 0b00000111
     when 0xFF13, 0xFF18
       channel = sound_channel(address)
+      # The period divider of the Audio Processing Unit (APU) runs at 1048576 Hz
+      # (every 4 CPU cycles).
+      # The period value
       channel[:period_value] = calc_pulse_channel_period_value value, @values[address + 1]
     when 0xFF14, 0xFF19
       channel = sound_channel(address)
